@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TypeMaster - Typing Speed Test</title>
+
+    <meta name="description" content="Improve your typing speed and accuracy with TypeMaster. Practice typing, track progress and challenge yourself.">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <nav class="navbar">
+
+            <div class="logo">
+                Type<span>Master</span>
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#test">Typing Test</a></li>
+                <li><a href="#practice">Practice</a></li>
+                <li><a href="#games">Games</a></li>
+                <li><a href="#leaderboard">Leaderboard</a></li>
+            </ul>
+
+        </nav>
+    </header>
+
+
+    <!-- Main Section -->
+    <main>
+
+        <!-- Home Section -->
+        <section id="home" class="hero">
+
+            <h1>Improve Your Typing Speed</h1>
+
+            <p>
+                Test your typing speed, improve your accuracy
+                and become a faster typist.
+            </p>
+
+            <a href="#test" class="start-link">
+                Start Typing Test
+            </a>
+
+        </section>
+
+
+        <!-- Typing Test Section -->
+        <section id="test" class="typing-section">
+
+            <h2>Typing Speed Test</h2>
+
+            <p class="section-description">
+                Type the displayed paragraph as quickly and
+                accurately as possible.
+            </p>
+
+
+            <!-- Test Settings -->
+            <div class="test-settings">
+
+                <label for="time-select">Test Duration:</label>
+
+                <select id="time-select">
+                    <option value="15">15 Seconds</option>
+                    <option value="30" selected>30 Seconds</option>
+                    <option value="60">60 Seconds</option>
+                    <option value="120">120 Seconds</option>
+                </select>
+
+                <label for="language-select">Language:</label>
+
+                <select id="language-select">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ur">Urdu</option>
+                </select>
+
+            </div>
+
+
+            <!-- Statistics -->
+            <div class="stats">
+
+                <div class="stat-box">
+                    <h3 id="timer">30</h3>
+                    <p>Time Left</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3 id="wpm">0</h3>
+                    <p>WPM</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3 id="accuracy">100%</h3>
+                    <p>Accuracy</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3 id="errors">0</h3>
+                    <p>Errors</p>
+                </div>
+
+            </div>
+
+
+            <!-- Text to Type -->
+            <div class="text-display" id="text-display">
+                The quick brown fox jumps over the lazy dog.
+                Practice every day to improve your typing speed
+                and accuracy.
+            </div>
+
+
+            <!-- Typing Input -->
+            <textarea
+                id="typing-input"
+                placeholder="Click Start Test and type here..."
+                disabled
+            ></textarea>
+
+
+            <!-- Buttons -->
+            <div class="test-buttons">
+
+                <button id="start-btn">
+                    Start Test
+                </button>
+
+                <button id="reset-btn">
+                    Reset Test
+                </button>
+
+            </div>
+
+            <p id="result-message"></p>
+
+        </section>
+
+
+        <!-- Practice Section -->
+        <section id="practice" class="feature-section">
+
+            <h2>Typing Practice</h2>
+
+            <p>
+                Improve your typing skills with regular
+                practice exercises.
+            </p>
+
+        </section>
+
+
+        <!-- Games Section -->
+        <section id="games" class="feature-section">
+
+            <h2>Typing Games</h2>
+
+            <p>
+                Learn typing through fun and interactive games.
+            </p>
+
+        </section>
+
+
+        <!-- Leaderboard Section -->
+        <section id="leaderboard" class="feature-section">
+
+            <h2>Leaderboard</h2>
+
+            <p>
+                Compete with other typists and improve your
+                personal records.
+            </p>
+
+            <p>Leaderboard coming soon!</p>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <p>
+            &copy; 2026 TypeMaster. All rights reserved.
+        </p>
+
+        <p>
+            Made to improve your typing skills.
+        </p>
+
+    </footer>
+
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+</html>
