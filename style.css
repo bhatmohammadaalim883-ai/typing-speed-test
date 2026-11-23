@@ -1,7 +1,10 @@
 
-/* =========================
-   GENERAL SETTINGS
-========================= */
+/* =========================================
+   TYPEMASTER - MAIN STYLESHEET
+========================================= */
+
+
+/* 1. GENERAL SETTINGS */
 
 * {
     margin: 0;
@@ -14,40 +17,57 @@ html {
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     background: #f4f7fb;
     color: #1e293b;
     line-height: 1.6;
 }
 
+button,
+select,
+textarea {
+    font-family: inherit;
+}
 
-/* =========================
-   NAVIGATION BAR
-========================= */
+
+/* 2. HEADER AND NAVIGATION */
 
 header {
     background: #111827;
-    padding: 18px 8%;
+    padding: 15px 8%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
 }
 
 .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
     font-size: 26px;
     font-weight: bold;
-    color: white;
+    white-space: nowrap;
 }
 
-.logo span {
+.logo > span > span {
     color: #38bdf8;
+}
+
+.logo svg {
+    flex-shrink: 0;
 }
 
 .nav-links {
     display: flex;
+    align-items: center;
     list-style: none;
     gap: 25px;
 }
@@ -56,7 +76,8 @@ header {
     text-decoration: none;
     color: white;
     font-size: 15px;
-    transition: 0.3s;
+    font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
@@ -64,36 +85,35 @@ header {
 }
 
 
-/* =========================
-   HERO SECTION
-========================= */
+/* 3. HERO SECTION */
 
 .hero {
     text-align: center;
-    padding: 90px 20px;
+    padding: 100px 20px;
     background: linear-gradient(135deg, #0f172a, #1d4ed8);
     color: white;
 }
 
 .hero h1 {
-    font-size: 42px;
+    font-size: 44px;
     margin-bottom: 15px;
 }
 
 .hero p {
     font-size: 18px;
     margin-bottom: 30px;
+    color: #dbeafe;
 }
 
 .start-link {
     display: inline-block;
     background: #38bdf8;
     color: #0f172a;
-    padding: 12px 28px;
+    padding: 13px 30px;
     border-radius: 8px;
     text-decoration: none;
     font-weight: bold;
-    transition: 0.3s;
+    transition: 0.3s ease;
 }
 
 .start-link:hover {
@@ -102,17 +122,16 @@ header {
 }
 
 
-/* =========================
-   TYPING TEST SECTION
-========================= */
+/* 4. MAIN SECTIONS */
 
-.typing-section {
-    max-width: 900px;
-    margin: 60px auto;
+.typing-section,
+.feature-section {
+    max-width: 950px;
+    margin: 45px auto;
     padding: 35px;
     background: white;
     border-radius: 15px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
     text-align: center;
 }
 
@@ -120,6 +139,7 @@ header {
 .feature-section h2 {
     font-size: 30px;
     margin-bottom: 10px;
+    color: #0f172a;
 }
 
 .section-description {
@@ -128,9 +148,7 @@ header {
 }
 
 
-/* =========================
-   TEST SETTINGS
-========================= */
+/* 5. TEST AND PRACTICE SETTINGS */
 
 .test-settings {
     display: flex;
@@ -141,17 +159,27 @@ header {
     margin-bottom: 30px;
 }
 
+.test-settings label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
 .test-settings select {
-    padding: 9px;
+    padding: 10px 14px;
     border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    border-radius: 7px;
     background: white;
+    color: #1e293b;
+    cursor: pointer;
+    outline: none;
+}
+
+.test-settings select:focus {
+    border-color: #2563eb;
 }
 
 
-/* =========================
-   STATISTICS
-========================= */
+/* 6. STATISTICS CARDS */
 
 .stats {
     display: grid;
@@ -162,13 +190,15 @@ header {
 
 .stat-box {
     background: #eff6ff;
-    padding: 18px;
+    padding: 20px 10px;
     border-radius: 10px;
+    border: 1px solid #dbeafe;
 }
 
 .stat-box h3 {
-    font-size: 27px;
+    font-size: 28px;
     color: #2563eb;
+    margin-bottom: 5px;
 }
 
 .stat-box p {
@@ -177,9 +207,7 @@ header {
 }
 
 
-/* =========================
-   TEXT DISPLAY
-========================= */
+/* 7. TEXT DISPLAY */
 
 .text-display {
     background: #f8fafc;
@@ -188,28 +216,34 @@ header {
     padding: 25px;
     margin-bottom: 20px;
     font-size: 19px;
-    line-height: 1.8;
+    line-height: 1.9;
     text-align: left;
+    color: #334155;
+    overflow-wrap: anywhere;
 }
 
 
-/* =========================
-   TYPING INPUT
-========================= */
+/* 8. TYPING INPUT AREAS */
 
-#typing-input {
+#typing-input,
+#practice-input {
     width: 100%;
-    height: 140px;
-    padding: 15px;
+    min-height: 140px;
+    padding: 16px;
     border: 2px solid #cbd5e1;
     border-radius: 10px;
     font-size: 17px;
+    line-height: 1.6;
     resize: vertical;
     outline: none;
     margin-bottom: 20px;
+    background: #ffffff;
+    color: #1e293b;
+    transition: border-color 0.3s ease;
 }
 
-#typing-input:focus {
+#typing-input:focus,
+#practice-input:focus {
     border-color: #2563eb;
 }
 
@@ -218,31 +252,42 @@ header {
     cursor: not-allowed;
 }
 
+#practice-input::placeholder,
+#typing-input::placeholder {
+    color: #94a3b8;
+}
 
-/* =========================
-   BUTTONS
-========================= */
+
+/* 9. BUTTONS */
 
 .test-buttons {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 15px;
 }
 
 .test-buttons button {
-    padding: 12px 25px;
+    padding: 12px 28px;
     border: none;
-    border-radius: 7px;
+    border-radius: 8px;
     background: #2563eb;
     color: white;
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.3s ease;
 }
 
 .test-buttons button:hover {
     background: #1d4ed8;
     transform: translateY(-2px);
+}
+
+.test-buttons button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 #reset-btn {
@@ -253,52 +298,60 @@ header {
     background: #475569;
 }
 
-#result-message {
-    margin-top: 20px;
-    font-weight: bold;
+#practice-reset {
+    background: #0891b2;
+}
+
+#practice-reset:hover {
+    background: #0e7490;
 }
 
 
-/* =========================
-   FEATURE SECTIONS
-========================= */
+/* 10. RESULT MESSAGES */
+
+#result-message,
+#practice-message {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+
+/* 11. FEATURE SECTIONS */
 
 .feature-section {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 45px 25px;
-    background: white;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    padding: 50px 25px;
 }
 
 .feature-section p {
     color: #64748b;
+    margin-top: 10px;
 }
 
 
-/* =========================
-   FOOTER
-========================= */
+/* 12. FOOTER */
 
 footer {
     background: #111827;
     color: white;
     text-align: center;
-    padding: 25px;
+    padding: 30px 15px;
     margin-top: 60px;
 }
 
+footer p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #cbd5e1;
+}
 
-/* =========================
-   MOBILE RESPONSIVENESS
-========================= */
 
-@media (max-width: 700px) {
+/* 13. RESPONSIVE DESIGN - TABLETS */
+
+@media (max-width: 900px) {
 
     header {
-        padding: 18px 5%;
+        padding: 15px 4%;
     }
 
     .navbar {
@@ -309,27 +362,104 @@ footer {
     .nav-links {
         justify-content: center;
         flex-wrap: wrap;
+        gap: 18px;
+    }
+
+    .typing-section,
+    .feature-section {
+        margin: 30px 18px;
+    }
+
+}
+
+
+/* 14. RESPONSIVE DESIGN - MOBILE */
+
+@media (max-width: 600px) {
+
+    .logo {
+        font-size: 23px;
+    }
+
+    .nav-links {
         gap: 12px;
     }
 
-    .hero h1 {
-        font-size: 30px;
+    .nav-links a {
+        font-size: 13px;
     }
 
-    .typing-section {
-        margin: 30px 12px;
-        padding: 20px;
+    .hero {
+        padding: 75px 18px;
+    }
+
+    .hero h1 {
+        font-size: 31px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .typing-section,
+    .feature-section {
+        margin: 25px 12px;
+        padding: 22px 16px;
+    }
+
+    .typing-section h2,
+    .feature-section h2 {
+        font-size: 25px;
     }
 
     .stats {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .stat-box {
+        padding: 15px 8px;
+    }
+
+    .stat-box h3 {
+        font-size: 24px;
+    }
+
+    .text-display {
+        padding: 17px;
+        font-size: 16px;
+    }
+
+    #typing-input,
+    #practice-input {
+        font-size: 15px;
     }
 
     .test-buttons {
         flex-direction: column;
     }
 
-    .feature-section {
-        margin: 20px 12px;
+    .test-buttons button {
+        width: 100%;
     }
+
+}
+
+
+/* 15. SMALL MOBILE SCREENS */
+
+@media (max-width: 380px) {
+
+    .nav-links {
+        gap: 9px;
+    }
+
+    .nav-links a {
+        font-size: 12px;
+    }
+
+    .hero h1 {
+        font-size: 27px;
+    }
+
 }
