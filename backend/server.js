@@ -23,28 +23,58 @@ pool.on("error", (error) => {
     console.error("Unexpected database error:", error.code || "UNKNOWN");
 });
 
-// Rate limiting
+// Rate limiters
 const registrationLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     limit: 5,
     standardHeaders: "draft-8",
-    legacyHeaders: false,
-    message: {
-        success: false,
-        message: "Too many registration attempts. Try again later."
-    }
+    legacyHeaders: false
 });
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 10,
     standardHeaders: "draft-8",
-    legacyHeaders: false,
-    message: {
-        success: false,
-        message: "Too many login attempts. Try again later."
-    }
+    legacyHeaders: false
 });
+
+// Authentication middleware
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({
+            success: false,
+            message: "Authentication token is required."
+        });
+    }
+
+    const token = authHeader.slice(7);
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+            issuer: "typemaster-api",
+            audience: "typemaster-users",
+            algorithms: ["HS256"]
+        });
+
+        if (!decoded.sub) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid authentication token."
+            });
+        }
+
+        req.userId = decoded.sub;
+        next();
+
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid or expired authentication token."
+        });
+    }
+}
 
 // Home route
 app.get("/", (req, res) => {
@@ -80,6 +110,7 @@ app.get("/api/db-health", async (req, res) => {
             users_table_created: result.rows[0].users_table_exists,
             time: result.rows[0].current_time
         });
+
     } catch (error) {
         console.error("Database health check failed:", error.code || "UNKNOWN");
 
@@ -91,95 +122,82 @@ app.get("/api/db-health", async (req, res) => {
 });
 
 // User registration
-app.post(
-    "/api/auth/register",
-    registrationLimiter,
-    async (req, res) => {
-        const body = req.body || {};
-        let { username, email, password } = body;
+app.post("/api/auth/register", registrationLimiter, async (req, res) => {
+    let { username, email, password } = req.body || {};
 
-        if (
-            typeof username !== "string" ||
-            typeof email !== "string" ||
-            typeof password !== "string"
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Username, email and password are required."
-            });
-        }
-
-        username = username.trim().toLowerCase();
-        email = email.trim().toLowerCase();
-
-        if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-            return res.status(400).json({
-                success: false,
-                message: "Username must be 3-20 characters and contain only letters, numbers or underscores."
-            });
-        }
-
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (email.length > 255 || !emailPattern.test(email)) {
-            return res.status(400).json({
-                success: false,
-                message: "Please enter a valid email address."
-            });
-        }
-
-        if (password.length < 8 || Buffer.byteLength(password, "utf8") > 72) {
-            return res.status(400).json({
-                success: false,
-                message: "Password must contain 8-72 bytes."
-            });
-        }
-
-        try {
-            const passwordHash = await bcrypt.hash(password, 12);
-
-            const result = await pool.query(
-                `INSERT INTO users (username, email, password_hash)
-                 VALUES ($1, $2, $3)
-                 RETURNING id, username, email, created_at`,
-                [username, email, passwordHash]
-            );
-
-            const user = result.rows[0];
-
-            res.status(201).json({
-                success: true,
-                message: "Your TypeMaster account has been created!",
-                user: {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    created_at: user.created_at
-                }
-            });
-
-        } catch (error) {
-            if (error.code === "23505") {
-                return res.status(409).json({
-                    success: false,
-                    message: "This username or email is already registered."
-                });
-            }
-
-            console.error("Registration failed:", error.code || "UNKNOWN");
-
-            res.status(500).json({
-                success: false,
-                message: "Unable to create your account right now."
-            });
-        }
+    if (
+        typeof username !== "string" ||
+        typeof email !== "string" ||
+        typeof password !== "string"
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "Username, email and password are required."
+        });
     }
-);
+
+    username = username.trim().toLowerCase();
+    email = email.trim().toLowerCase();
+
+    if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+        return res.status(400).json({
+            success: false,
+            message: "Username must be 3-20 characters and contain only letters, numbers or underscores."
+        });
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (email.length > 255 || !emailPattern.test(email)) {
+        return res.status(400).json({
+            success: false,
+            message: "Please enter a valid email address."
+        });
+    }
+
+    if (password.length < 8 || Buffer.byteLength(password, "utf8") > 72) {
+        return res.status(400).json({
+            success: false,
+            message: "Password must contain 8-72 bytes."
+        });
+    }
+
+    try {
+        const passwordHash = await bcrypt.hash(password, 12);
+
+        const result = await pool.query(
+            `INSERT INTO users (username, email, password_hash)
+             VALUES ($1, $2, $3)
+             RETURNING id, username, email, created_at`,
+            [username, email, passwordHash]
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: "Your TypeMaster account has been created!",
+            user: result.rows[0]
+        });
+
+    } catch (error) {
+        if (error.code === "23505") {
+            return res.status(409).json({
+                success: false,
+                message: "This username or email is already registered."
+            });
+        }
+
+        console.error("Registration failed:", error.code || "UNKNOWN");
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to create your account right now."
+        });
+    }
+});
 
 // User login
 app.post("/api/auth/login", loginLimiter, async (req, res) => {
-    const body = req.body || {};
-    let { email, password } = body;
+    let { email, password } = req.body || {};
 
     if (typeof email !== "string" || typeof password !== "string") {
         return res.status(400).json({
@@ -190,8 +208,11 @@ app.post("/api/auth/login", loginLimiter, async (req, res) => {
 
     email = email.trim().toLowerCase();
 
-    if (email.length > 255 || password.length === 0 ||
-        Buffer.byteLength(password, "utf8") > 72) {
+    if (
+        email.length > 255 ||
+        password.length === 0 ||
+        Buffer.byteLength(password, "utf8") > 72
+    ) {
         return res.status(400).json({
             success: false,
             message: "Invalid email or password."
@@ -233,11 +254,12 @@ app.post("/api/auth/login", loginLimiter, async (req, res) => {
             {
                 expiresIn: "1h",
                 issuer: "typemaster-api",
-                audience: "typemaster-users"
+                audience: "typemaster-users",
+                algorithm: "HS256"
             }
         );
 
-        res.json({
+        return res.json({
             success: true,
             message: "Login successful!",
             token,
@@ -252,9 +274,41 @@ app.post("/api/auth/login", loginLimiter, async (req, res) => {
     } catch (error) {
         console.error("Login failed:", error.code || "UNKNOWN");
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Unable to log in right now."
+        });
+    }
+});
+
+// Protected user profile
+app.get("/api/auth/me", authenticateToken, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, username, email, created_at
+             FROM users
+             WHERE id = $1`,
+            [req.userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "User account not found."
+            });
+        }
+
+        return res.json({
+            success: true,
+            user: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("Profile request failed:", error.code || "UNKNOWN");
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to retrieve your profile."
         });
     }
 });
