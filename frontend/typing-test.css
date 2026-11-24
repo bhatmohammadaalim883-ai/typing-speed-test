@@ -1,0 +1,237 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6fb;
+  color: #202b43;
+}
+
+.navbar {
+  background: #172554;
+  color: white;
+  padding: 18px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+}
+
+nav a.active {
+  color: #93c5fd;
+  font-weight: bold;
+}
+
+.container {
+  width: min(1100px, 92%);
+  margin: 35px auto;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.heading h1 {
+  font-size: 34px;
+  margin-bottom: 10px;
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.setting,
+.test-card,
+.practice-card {
+  background: white;
+  padding: 22px;
+  border-radius: 13px;
+  box-shadow: 0 4px 15px #0000000b;
+}
+
+.setting label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.setting select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #d5dbea;
+  border-radius: 7px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.stat span {
+  display: block;
+  color: #2563eb;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.stat small {
+  color: #64748b;
+}
+
+.text-display {
+  min-height: 110px;
+  padding: 20px;
+  background: #f1f5f9;
+  border-radius: 9px;
+  font-size: 20px;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  overflow-wrap: anywhere;
+}
+
+.text-display .correct {
+  color: #15803d;
+}
+
+.text-display .incorrect {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+#typingInput,
+#practiceInput {
+  width: 100%;
+  min-height: 120px;
+  padding: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  font-size: 17px;
+  resize: vertical;
+  outline-color: #2563eb;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+button {
+  padding: 12px 22px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.88;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.secondary {
+  background: #475569;
+}
+
+#resultMessage {
+  margin-top: 18px;
+  font-weight: bold;
+}
+
+.practice-card {
+  margin-top: 30px;
+}
+
+.practice-card h2 {
+  margin-bottom: 10px;
+}
+
+.practice-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+#practiceArea {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+#practiceTitle {
+  margin-bottom: 12px;
+}
+
+#practiceText {
+  padding: 15px;
+  margin-bottom: 15px;
+  background: white;
+  border-radius: 8px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.practice-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin: 18px 0;
+}
+
+@media (max-width: 800px) {
+  .settings {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .settings,
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .heading h1 {
+    font-size: 27px;
+  }
+
+  .navbar {
+    justify-content: center;
+  }
+}
