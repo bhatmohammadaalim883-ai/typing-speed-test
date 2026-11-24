@@ -1,0 +1,219 @@
+
+.coach-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 7%;
+    background: #111827;
+    color: white;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.coach-logo {
+    color: #60a5fa;
+    font-size: 25px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.coach-header nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.coach-header nav a {
+    color: #e5e7eb;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.coach-header nav a:hover {
+    color: #60a5fa;
+}
+
+.coach-container {
+    width: min(900px, 90%);
+    margin: 45px auto;
+}
+
+.coach-intro {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.coach-tag {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.coach-intro h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    margin: 18px 0 10px;
+    color: #111827;
+}
+
+.coach-intro p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.coach-card,
+.coach-results,
+.coach-note {
+    background: white;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
+}
+
+.coach-card h2,
+.coach-results h2 {
+    color: #111827;
+    margin-top: 0;
+}
+
+.coach-card > p {
+    color: #6b7280;
+}
+
+.coach-input-group {
+    margin: 22px 0;
+}
+
+.coach-input-group label {
+    display: block;
+    margin-bottom: 9px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.coach-input-group input,
+.coach-input-group select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.coach-input-group input:focus,
+.coach-input-group select:focus {
+    outline: 2px solid #60a5fa;
+    border-color: #2563eb;
+}
+
+#analyseBtn {
+    width: 100%;
+    padding: 15px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 9px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#analyseBtn:hover {
+    background: #1d4ed8;
+}
+
+.coach-results[hidden] {
+    display: none;
+}
+
+.coach-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin: 25px 0;
+}
+
+.coach-stat {
+    background: #eff6ff;
+    padding: 22px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.coach-stat span,
+.coach-stat small {
+    display: block;
+    color: #4b5563;
+}
+
+.coach-stat strong {
+    display: block;
+    font-size: 30px;
+    color: #1d4ed8;
+    margin: 10px 0;
+}
+
+.coach-feedback {
+    background: #f9fafb;
+    border-left: 4px solid #2563eb;
+    padding: 18px;
+    border-radius: 8px;
+    margin-top: 18px;
+}
+
+.coach-feedback h3 {
+    color: #111827;
+    margin-top: 0;
+}
+
+.coach-feedback p,
+.coach-feedback li {
+    color: #4b5563;
+    line-height: 1.7;
+}
+
+.coach-feedback ul {
+    padding-left: 22px;
+}
+
+.coach-note {
+    background: #eff6ff;
+    text-align: center;
+}
+
+.coach-note h3 {
+    color: #1d4ed8;
+}
+
+.coach-note p {
+    color: #374151;
+    line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+    .coach-header {
+        justify-content: center;
+    }
+
+    .coach-header nav {
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .coach-card,
+    .coach-results,
+    .coach-note {
+        padding: 20px;
+    }
+
+    .coach-stats {
+        grid-template-columns: 1fr;
+    }
+}
