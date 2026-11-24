@@ -2,10 +2,10 @@
 CREATE TABLE IF NOT EXISTS daily_challenge_completions (
     id BIGSERIAL PRIMARY KEY,
 
-    user_id INTEGER NOT NULL
+    
         REFERENCES users(id)
         ON DELETE CASCADE,
-
+     user_id BIGINT NOT NULL
     challenge_date DATE NOT NULL,
 
     challenge_title VARCHAR(100) NOT NULL,
