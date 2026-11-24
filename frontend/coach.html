@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Typing Coach | TypeMaster</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="coach.css">
+</head>
+<body>
+
+    <header class="coach-header">
+        <a href="index.html" class="coach-logo">TypeMaster</a>
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="games.html">Games</a>
+            <a href="leaderboard.html">Leaderboard</a>
+        </nav>
+    </header>
+
+    <main class="coach-container">
+
+        <section class="coach-intro">
+            <span class="coach-tag">AI POWERED</span>
+            <h1>Your Personal AI Typing Coach</h1>
+            <p>Understand your typing performance and get personalised tips to improve.</p>
+        </section>
+
+        <section class="coach-card">
+            <h2>Typing Performance Analysis</h2>
+            <p>Enter your latest typing test results below.</p>
+
+            <form id="coachForm">
+
+                <div class="coach-input-group">
+                    <label for="wpm">Typing Speed (WPM)</label>
+                    <input type="number" id="wpm" min="0" max="1000"
+                        step="0.1" placeholder="Example: 45" required>
+                </div>
+
+                <div class="coach-input-group">
+                    <label for="accuracy">Accuracy (%)</label>
+                    <input type="number" id="accuracy" min="0" max="100"
+                        step="0.1" placeholder="Example: 95" required>
+                </div>
+
+                <div class="coach-input-group">
+                    <label for="duration">Test Duration</label>
+                    <select id="duration" required>
+                        <option value="15">15 seconds</option>
+                        <option value="30" selected>30 seconds</option>
+                        <option value="60">60 seconds</option>
+                        <option value="120">2 minutes</option>
+                        <option value="300">5 minutes</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="analyseBtn">
+                    Analyse My Performance
+                </button>
+
+            </form>
+        </section>
+
+        <section class="coach-results" id="coachResults" hidden>
+            <h2>Your Typing Analysis</h2>
+
+            <div class="coach-stats">
+                <div class="coach-stat">
+                    <span>Speed</span>
+                    <strong id="resultWpm">0</strong>
+                    <small>WPM</small>
+                </div>
+
+                <div class="coach-stat">
+                    <span>Accuracy</span>
+                    <strong id="resultAccuracy">0%</strong>
+                </div>
+            </div>
+
+            <div class="coach-feedback">
+                <h3>Performance Overview</h3>
+                <p id="overview"></p>
+            </div>
+
+            <div class="coach-feedback">
+                <h3>Improvement Suggestions</h3>
+                <ul id="suggestions"></ul>
+            </div>
+
+            <div class="coach-feedback">
+                <h3>Your Next Practice Goal</h3>
+                <p id="practiceGoal"></p>
+            </div>
+        </section>
+
+        <section class="coach-note">
+            <h3>Remember</h3>
+            <p>Consistent practice and accurate typing are more important than speed alone.</p>
+        </section>
+
+    </main>
+
+    <script src="coach.js"></script>
+</body>
+</html>
