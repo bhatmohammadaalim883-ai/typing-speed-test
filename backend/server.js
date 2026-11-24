@@ -11,33 +11,32 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET || !process.env.DATABASE_URL) {
-    console.error("Missing JWT_SECRET or DATABASE_URL environment variable.");
+    console.error("Missing JWT_SECRET or DATABASE_URL.");
     process.exit(1);
 }
 
-// ===================================
-// MIDDLEWARE
-// ===================================
+// =====================================
+// Middleware
+// =====================================
 
 app.use(cors());
 app.use(express.json({ limit: "10kb" }));
 
-// ===================================
-// POSTGRESQL CONNECTION
-// ===================================
+// =====================================
+// PostgreSQL
+// =====================================
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
-// ===================================
-// RATE LIMITERS
-// ===================================
+// =====================================
+// Rate Limiters
+// =====================================
 
 const registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
@@ -61,9 +60,113 @@ const loginLimiter = rateLimit({
     }
 });
 
-// ===================================
-// DATABASE INITIALIZATION
-// ===================================
+// =====================================
+// Daily Challenge Definitions
+// =====================================
+
+const dailyChallenges = [
+    {
+        title: "Accuracy Master",
+        description: "Complete a typing challenge with excellent accuracy.",
+        wpm: 30,
+        accuracy: 95,
+        duration: 60,
+        points: 50
+    },
+    {
+        title: "Speed Champion",
+        description: "Challenge yourself to reach a higher typing speed.",
+        wpm: 45,
+        accuracy: 90,
+        duration: 60,
+        points: 75
+    },
+    {
+        title: "Consistency Challenge",
+        description: "Maintain steady typing performance throughout your test.",
+        wpm: 35,
+        accuracy: 97,
+        duration: 120,
+        points: 100
+    },
+    {
+        title: "Typing Expert",
+        description: "Combine good speed with excellent accuracy.",
+        wpm: 55,
+        accuracy: 95,
+        duration: 60,
+        points: 125
+    },
+    {
+        title: "Practice Master",
+        description: "Complete a longer typing session with consistent accuracy.",
+        wpm: 40,
+        accuracy: 96,
+        duration: 120,
+        points: 100
+    }
+];
+
+// Use India Standard Time for daily challenges.
+function getIndiaDateKey() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).formatToParts(new Date());
+
+    const values = {};
+
+    parts.forEach(part => {
+        values[part.type] = part.value;
+    });
+
+    return `${values.year}-${values.month}-${values.day}`;
+}
+
+function getDayNumber(dateString) {
+    const [year, month, day] = dateString.split("-").map(Number);
+
+    return Math.floor(
+        Date.UTC(year, month - 1, day) / 86400000
+    );
+}
+
+function getDailyChallenge(dateString) {
+    const index = getDayNumber(dateString) % dailyChallenges.length;
+
+    return dailyChallenges[index];
+}
+
+function calculateStreak(completedDates) {
+    const completed = new Set(completedDates);
+
+    const today = getIndiaDateKey();
+    const yesterdayDate = new Date(`${today}T00:00:00Z`);
+
+    yesterdayDate.setUTCDate(yesterdayDate.getUTCDate() - 1);
+
+    const yesterday = yesterdayDate.toISOString().slice(0, 10);
+
+    let checkDate = completed.has(today) ? today : yesterday;
+    let streak = 0;
+
+    while (completed.has(checkDate)) {
+        streak++;
+
+        const date = new Date(`${checkDate}T00:00:00Z`);
+        date.setUTCDate(date.getUTCDate() - 1);
+
+        checkDate = date.toISOString().slice(0, 10);
+    }
+
+    return streak;
+}
+
+// =====================================
+// Database Initialization
+// =====================================
 
 async function initializeDatabase() {
     await pool.query(`
@@ -96,12 +199,35 @@ async function initializeDatabase() {
         ON typing_tests(user_id, created_at DESC);
     `);
 
-    console.log("Database tables initialized successfully.");
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS daily_challenge_completions (
+            id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+            user_id BIGINT NOT NULL
+                REFERENCES users(id) ON DELETE CASCADE,
+            challenge_date DATE NOT NULL,
+            challenge_title VARCHAR(100) NOT NULL,
+            wpm NUMERIC(7,2) NOT NULL CHECK (wpm >= 0),
+            accuracy NUMERIC(5,2) NOT NULL
+                CHECK (accuracy >= 0 AND accuracy <= 100),
+            duration_seconds INTEGER NOT NULL
+                CHECK (duration_seconds > 0),
+            points INTEGER NOT NULL DEFAULT 0 CHECK (points >= 0),
+            completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            UNIQUE (user_id, challenge_date)
+        );
+    `);
+
+    await pool.query(`
+        CREATE INDEX IF NOT EXISTS idx_daily_challenges_user_date
+        ON daily_challenge_completions(user_id, challenge_date DESC);
+    `);
+
+    console.log("All TypeMaster database tables initialized.");
 }
 
-// ===================================
-// AUTHENTICATION MIDDLEWARE
-// ===================================
+// =====================================
+// Authentication Middleware
+// =====================================
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -138,9 +264,9 @@ function authenticateToken(req, res, next) {
     }
 }
 
-// ===================================
-// HOME ROUTE
-// ===================================
+// =====================================
+// Home Route
+// =====================================
 
 app.get("/", (req, res) => {
     res.json({
@@ -149,9 +275,9 @@ app.get("/", (req, res) => {
     });
 });
 
-// ===================================
-// HEALTH CHECK
-// ===================================
+// =====================================
+// Health Check
+// =====================================
 
 app.get("/api/health", (req, res) => {
     res.json({
@@ -160,24 +286,30 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-// ===================================
-// DATABASE HEALTH CHECK
-// ===================================
+// =====================================
+// Database Health Check
+// =====================================
 
 app.get("/api/db-health", async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT
                 to_regclass('public.users') AS users_table,
-                to_regclass('public.typing_tests') AS typing_tests_table
+                to_regclass('public.typing_tests') AS typing_tests_table,
+                to_regclass('public.daily_challenge_completions')
+                    AS challenges_table
         `);
 
         res.json({
             success: true,
             database: "connected",
             users_table_created: Boolean(result.rows[0].users_table),
-            typing_tests_table_created:
-                Boolean(result.rows[0].typing_tests_table)
+            typing_tests_table_created: Boolean(
+                result.rows[0].typing_tests_table
+            ),
+            challenges_table_created: Boolean(
+                result.rows[0].challenges_table
+            )
         });
 
     } catch (error) {
@@ -190,9 +322,9 @@ app.get("/api/db-health", async (req, res) => {
     }
 });
 
-// ===================================
-// USER REGISTRATION
-// ===================================
+// =====================================
+// User Registration
+// =====================================
 
 app.post(
     "/api/auth/register",
@@ -284,9 +416,9 @@ app.post(
     }
 );
 
-// ===================================
-// USER LOGIN
-// ===================================
+// =====================================
+// User Login
+// =====================================
 
 app.post(
     "/api/auth/login",
@@ -365,9 +497,9 @@ app.post(
     }
 );
 
-// ===================================
-// GET LOGGED-IN USER PROFILE
-// ===================================
+// =====================================
+// Get Logged-in User Profile
+// =====================================
 
 app.get("/api/auth/me", authenticateToken, async (req, res) => {
     try {
@@ -405,9 +537,9 @@ app.get("/api/auth/me", authenticateToken, async (req, res) => {
     }
 });
 
-// ===================================
-// SAVE TYPING TEST RESULT
-// ===================================
+// =====================================
+// Save Typing Test Result
+// =====================================
 
 app.post(
     "/api/typing-tests",
@@ -500,9 +632,9 @@ app.post(
     }
 );
 
-// ===================================
-// GET TYPING STATISTICS
-// ===================================
+// =====================================
+// Get Typing Statistics
+// =====================================
 
 app.get(
     "/api/typing-tests/stats",
@@ -547,9 +679,9 @@ app.get(
     }
 );
 
-// ===================================
-// GLOBAL LEADERBOARD
-// ===================================
+// =====================================
+// Leaderboard
+// =====================================
 
 app.get("/api/leaderboard", async (req, res) => {
     try {
@@ -560,11 +692,9 @@ app.get("/api/leaderboard", async (req, res) => {
         if (period === "daily") {
             dateCondition =
                 "AND tt.created_at >= NOW() - INTERVAL '1 day'";
-
         } else if (period === "weekly") {
             dateCondition =
                 "AND tt.created_at >= NOW() - INTERVAL '7 days'";
-
         } else if (period !== "all-time") {
             return res.status(400).json({
                 success: false,
@@ -578,21 +708,14 @@ app.get("/api/leaderboard", async (req, res) => {
                 COUNT(*)::INTEGER AS total_tests,
                 ROUND(AVG(tt.wpm)::numeric, 1) AS average_wpm,
                 ROUND(AVG(tt.accuracy)::numeric, 1) AS average_accuracy
-
             FROM typing_tests tt
-
-            INNER JOIN users u
-                ON u.id = tt.user_id
-
+            INNER JOIN users u ON u.id = tt.user_id
             WHERE 1=1
             ${dateCondition}
-
             GROUP BY u.id, u.username
-
-            ORDER BY
-                AVG(tt.wpm) DESC,
-                AVG(tt.accuracy) DESC,
-                COUNT(*) DESC
+            ORDER BY AVG(tt.wpm) DESC,
+                     AVG(tt.accuracy) DESC,
+                     COUNT(*) DESC
         `;
 
         const result = await pool.query(query);
@@ -613,9 +736,192 @@ app.get("/api/leaderboard", async (req, res) => {
     }
 });
 
-// ===================================
-// START SERVER
-// ===================================
+// =====================================
+// Get Today's Challenge and User Progress
+// =====================================
+
+app.get(
+    "/api/challenges/me",
+    authenticateToken,
+    async (req, res) => {
+        try {
+            const today = getIndiaDateKey();
+            const challenge = getDailyChallenge(today);
+
+            const result = await pool.query(
+                `SELECT
+                    challenge_date::text AS challenge_date,
+                    challenge_title,
+                    wpm,
+                    accuracy,
+                    duration_seconds,
+                    points,
+                    completed_at
+                 FROM daily_challenge_completions
+                 WHERE user_id = $1
+                 ORDER BY challenge_date DESC`,
+                [req.user.id]
+            );
+
+            const history = result.rows;
+            const completedDates = history.map(
+                item => item.challenge_date
+            );
+
+            const todayCompleted = completedDates.includes(today);
+
+            const totalPoints = history.reduce(
+                (total, item) => total + Number(item.points),
+                0
+            );
+
+            res.json({
+                success: true,
+                today,
+                challenge,
+                completedToday: todayCompleted,
+                completedCount: history.length,
+                totalPoints,
+                currentStreak: calculateStreak(completedDates),
+                history: history.slice(0, 30)
+            });
+
+        } catch (error) {
+            console.error("Challenge progress error:", error.message);
+
+            res.status(500).json({
+                success: false,
+                message: "Could not retrieve challenge progress."
+            });
+        }
+    }
+);
+
+// =====================================
+// Complete Today's Challenge
+// =====================================
+
+app.post(
+    "/api/challenges/complete",
+    authenticateToken,
+    async (req, res) => {
+        try {
+            const typingTestId = req.body.typing_test_id;
+
+            if (
+                !typingTestId ||
+                !/^\d+$/.test(String(typingTestId))
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "A valid typing test ID is required."
+                });
+            }
+
+            const today = getIndiaDateKey();
+            const challenge = getDailyChallenge(today);
+
+            // Only use a test belonging to this user,
+            // completed today, in India Standard Time.
+            const testResult = await pool.query(
+                `SELECT id, wpm, accuracy, duration_seconds
+                 FROM typing_tests
+                 WHERE id = $1
+                   AND user_id = $2
+                   AND (created_at AT TIME ZONE 'Asia/Kolkata')::date
+                       = $3::date`,
+                [String(typingTestId), req.user.id, today]
+            );
+
+            if (testResult.rows.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Today's typing test was not found."
+                });
+            }
+
+            const test = testResult.rows[0];
+
+            const wpm = Number(test.wpm);
+            const accuracy = Number(test.accuracy);
+            const duration = Number(test.duration_seconds);
+
+            const meetsRequirements =
+                wpm >= challenge.wpm &&
+                accuracy >= challenge.accuracy &&
+                duration >= challenge.duration;
+
+            if (!meetsRequirements) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Challenge targets were not reached.",
+                    required: {
+                        wpm: challenge.wpm,
+                        accuracy: challenge.accuracy,
+                        duration: challenge.duration
+                    },
+                    achieved: {
+                        wpm,
+                        accuracy,
+                        duration
+                    }
+                });
+            }
+
+            const result = await pool.query(
+                `INSERT INTO daily_challenge_completions
+                    (
+                        user_id,
+                        challenge_date,
+                        challenge_title,
+                        wpm,
+                        accuracy,
+                        duration_seconds,
+                        points
+                    )
+                 VALUES ($1, $2::date, $3, $4, $5, $6, $7)
+                 ON CONFLICT (user_id, challenge_date) DO NOTHING
+                 RETURNING id, challenge_date, challenge_title,
+                           points, completed_at`,
+                [
+                    req.user.id,
+                    today,
+                    challenge.title,
+                    wpm,
+                    accuracy,
+                    duration,
+                    challenge.points
+                ]
+            );
+
+            if (result.rows.length === 0) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Today's challenge has already been claimed."
+                });
+            }
+
+            res.status(201).json({
+                success: true,
+                message: "Daily challenge completed!",
+                completion: result.rows[0],
+                pointsAwarded: challenge.points
+            });
+
+        } catch (error) {
+            console.error("Challenge completion error:", error.message);
+
+            res.status(500).json({
+                success: false,
+                message: "Could not complete the daily challenge."
+            });
+        }
+    }
+);
+
+// =====================================
+// Start Server
+// =====================================
 
 async function startServer() {
     try {
