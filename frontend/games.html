@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Games | TypeMaster</title>
+  <link rel="stylesheet" href="games.css">
+</head>
+<body>
+
+<header class="navbar">
+  <a href="index.html" class="logo">TypeMaster</a>
+
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="typing-test.html">Typing Test</a>
+    <a href="games.html" class="active">Games</a>
+    <a href="leaderboard.html">Leaderboard</a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+    <span class="tag">TYPEMASTER ARCADE</span>
+    <h1>Typing Games</h1>
+    <p>Learn, compete and improve your typing skills through fun challenges.</p>
+  </section>
+
+  <section class="game-stats">
+    <div class="stat-card">
+      <span id="gamesPlayed">0</span>
+      <p>Games Played</p>
+    </div>
+
+    <div class="stat-card">
+      <span id="bestScore">0</span>
+      <p>Best Score</p>
+    </div>
+
+    <div class="stat-card">
+      <span id="totalPoints">0</span>
+      <p>Total Points</p>
+    </div>
+  </section>
+
+  <section class="games-section">
+    <h2>Choose Your Game</h2>
+
+    <div class="games-grid">
+
+      <article class="game-card">
+        <div class="game-icon">🌧️</div>
+        <h3>Word Rain</h3>
+        <p>Type falling words before the timer runs out.</p>
+        <span class="difficulty easy">Easy</span>
+        <button data-game="wordRain">Play Now</button>
+      </article>
+
+      <article class="game-card">
+        <div class="game-icon">🏎️</div>
+        <h3>Typing Race</h3>
+        <p>Race against the clock with your typing speed.</p>
+        <span class="difficulty medium">Medium</span>
+        <button data-game="typingRace">Play Now</button>
+      </article>
+
+      <article class="game-card">
+        <div class="game-icon">🔤</div>
+        <h3>Word Scramble</h3>
+        <p>Unscramble letters to discover the correct word.</p>
+        <span class="difficulty medium">Medium</span>
+        <button data-game="wordScramble">Play Now</button>
+      </article>
+
+      <article class="game-card">
+        <div class="game-icon">🎯</div>
+        <h3>Accuracy Challenge</h3>
+        <p>Type sentences correctly and earn points.</p>
+        <span class="difficulty hard">Hard</span>
+        <button data-game="accuracyChallenge">Play Now</button>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="game-area" id="gameArea" hidden>
+
+    <div class="game-header">
+      <div>
+        <h2 id="gameTitle">Game</h2>
+        <p id="gameDescription">Get ready!</p>
+      </div>
+
+      <button id="closeGame" class="close-btn">Close</button>
+    </div>
+
+    <div class="game-info">
+      <div>Time: <strong id="gameTimer">60</strong>s</div>
+      <div>Score: <strong id="gameScore">0</strong></div>
+    </div>
+
+    <div id="gameContent">
+      <p id="gamePrompt"></p>
+
+      <input
+        type="text"
+        id="gameInput"
+        placeholder="Type here..."
+        autocomplete="off"
+        spellcheck="false"
+      >
+
+      <p id="gameFeedback" aria-live="polite"></p>
+
+      <button id="startGame">Start Game</button>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="games.js"></script>
+</body>
+</html>
