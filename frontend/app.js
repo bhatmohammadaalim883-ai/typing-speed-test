@@ -3,6 +3,7 @@
 // TYPEMASTER - TYPING SPEED TEST PLATFORM
 // =============================================
 
+const API_URL = "https://typing-speed-test-26ct.onrender.com";
 
 // =============================================
 // 1. SELECT HTML ELEMENTS
@@ -20,19 +21,16 @@ const typingInput = document.getElementById("typing-input");
 
 const startButton = document.getElementById("start-btn");
 const resetButton = document.getElementById("reset-btn");
-
 const timeSelect = document.getElementById("time-select");
 const languageSelect = document.getElementById("language-select");
 
 const resultMessage = document.getElementById("result-message");
-
 
 // Typing Practice Elements
 
 const practiceLevel = document.getElementById("practice-level");
 const practiceText = document.getElementById("practice-text");
 const practiceInput = document.getElementById("practice-input");
-
 const practiceWpm = document.getElementById("practice-wpm");
 const practiceAccuracy = document.getElementById("practice-accuracy");
 const practiceErrors = document.getElementById("practice-errors");
@@ -40,36 +38,37 @@ const practiceErrors = document.getElementById("practice-errors");
 const practiceReset = document.getElementById("practice-reset");
 const practiceMessage = document.getElementById("practice-message");
 
-
 // =============================================
 // 2. TYPING TEST PASSAGES
 // =============================================
 
 const typingTexts = {
-
     en: "The quick brown fox jumps over the lazy dog. Practice every day to improve your typing speed and accuracy.",
 
     hi: "अभ्यास करने से हमारी गति और सटीकता में सुधार होता है। नियमित अभ्यास सफलता की कुंजी है।",
 
     ur: "محنت اور مسلسل مشق سے انسان اپنی صلاحیتوں کو بہتر بنا سکتا ہے۔"
-
 };
 
+// Language names for database
+
+const languageNames = {
+    en: "English",
+    hi: "Hindi",
+    ur: "Urdu"
+};
 
 // =============================================
 // 3. PRACTICE PASSAGES
 // =============================================
 
 const practiceTexts = {
-
     easy: "Learning to type is a useful skill. Practice every day and improve your typing speed.",
 
     medium: "Technology is changing the world. Computers help people communicate, learn, work and solve problems.",
 
     hard: "Successful typing requires concentration, consistency, patience and accuracy. Keep practising to improve your performance."
-
 };
-
 
 // =============================================
 // 4. TEST VARIABLES
@@ -82,7 +81,6 @@ let timer = null;
 let isRunning = false;
 
 let startTime = null;
-
 
 // =============================================
 // 5. TEST STATISTICS FUNCTION
@@ -97,15 +95,10 @@ function calculateStatistics(typedText, originalText, elapsedSeconds) {
     for (let i = 0; i < typedText.length; i++) {
 
         if (typedText[i] === originalText[i]) {
-
             correctCharacters++;
-
         } else {
-
             errors++;
-
         }
-
     }
 
     const minutes = elapsedSeconds / 60;
@@ -113,19 +106,15 @@ function calculateStatistics(typedText, originalText, elapsedSeconds) {
     let wpm = 0;
 
     if (minutes > 0) {
-
         wpm = Math.round((correctCharacters / 5) / minutes);
-
     }
 
     let accuracy = 100;
 
     if (typedText.length > 0) {
-
         accuracy = Math.round(
             (correctCharacters / typedText.length) * 100
         );
-
     }
 
     return {
@@ -133,9 +122,7 @@ function calculateStatistics(typedText, originalText, elapsedSeconds) {
         accuracy,
         errors
     };
-
 }
-
 
 // =============================================
 // 6. UPDATE TEST STATISTICS
@@ -164,8 +151,11 @@ function updateStatistics() {
 
     errorsElement.textContent = stats.errors;
 
+    return {
+        ...stats,
+        elapsedSeconds
+    };
 }
-
 
 // =============================================
 // 7. RESET TYPING TEST
@@ -176,6 +166,8 @@ function resetTest() {
     clearInterval(timer);
 
     isRunning = false;
+
+    startTime = null;
 
     timeLeft = Number(timeSelect.value);
 
@@ -196,15 +188,88 @@ function resetTest() {
     resultMessage.textContent = "";
 
     textDisplay.textContent = typingTexts[languageSelect.value];
-
 }
 
+// =============================================
+// 8. SAVE TYPING TEST RESULT TO DATABASE
+// =============================================
+
+async function saveTypingTestResult(stats) {
+
+    const token = sessionStorage.getItem("typemaster_token");
+
+    if (!token) {
+        return {
+            success: false,
+            message: "Log in to save this result to your account."
+        };
+    }
+
+    const language =
+        languageNames[languageSelect.value] || "English";
+
+    const durationSeconds = Math.max(
+        1,
+        Math.ceil(stats.elapsedSeconds)
+    );
+
+    try {
+
+        const response = await fetch(`${API_URL}/api/typing-tests`, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+
+            body: JSON.stringify({
+                wpm: stats.wpm,
+                accuracy: stats.accuracy,
+                duration_seconds: durationSeconds,
+                language: language
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+
+            if (response.status === 401) {
+                sessionStorage.removeItem("typemaster_token");
+
+                return {
+                    success: false,
+                    message: "Your session expired. Please log in again."
+                };
+            }
+
+            throw new Error(data.message || "Could not save result.");
+        }
+
+        return {
+            success: true,
+            message: "Your typing result was saved successfully!"
+        };
+
+    } catch (error) {
+
+        console.error("Save typing result error:", error);
+
+        return {
+            success: false,
+            message: "Could not save your result. Please try again later."
+        };
+    }
+}
 
 // =============================================
-// 8. END TYPING TEST
+// 9. END TYPING TEST
 // =============================================
 
-function endTest() {
+async function endTest() {
 
     if (!isRunning) return;
 
@@ -216,20 +281,36 @@ function endTest() {
 
     startButton.disabled = false;
 
-    updateStatistics();
+    const stats = updateStatistics();
+
+    if (typingInput.value.length === 0) {
+
+        resultMessage.textContent =
+            "Test completed. No typing was entered, so no result was saved.";
+
+        return;
+    }
 
     resultMessage.textContent =
         "Test completed! Your typing speed is " +
-        wpmElement.textContent +
+        stats.wpm +
         " WPM with " +
-        accuracyElement.textContent +
-        " accuracy.";
+        stats.accuracy +
+        "% accuracy. Saving your result...";
 
+    const saveResult = await saveTypingTestResult(stats);
+
+    resultMessage.textContent =
+        "Test completed! Your typing speed is " +
+        stats.wpm +
+        " WPM with " +
+        stats.accuracy +
+        "% accuracy. " +
+        saveResult.message;
 }
 
-
 // =============================================
-// 9. START TYPING TEST
+// 10. START TYPING TEST
 // =============================================
 
 function startTest() {
@@ -255,18 +336,14 @@ function startTest() {
         updateStatistics();
 
         if (timeLeft <= 0) {
-
             endTest();
-
         }
 
     }, 1000);
-
 }
 
-
 // =============================================
-// 10. TYPING TEST INPUT EVENT
+// 11. TYPING TEST INPUT EVENT
 // =============================================
 
 typingInput.addEventListener("input", function () {
@@ -278,32 +355,26 @@ typingInput.addEventListener("input", function () {
     const originalText = textDisplay.textContent;
 
     if (typingInput.value.length >= originalText.length) {
-
         endTest();
-
     }
-
 });
 
-
 // =============================================
-// 11. TYPING TEST BUTTON EVENTS
+// 12. TYPING TEST BUTTON EVENTS
 // =============================================
 
 startButton.addEventListener("click", startTest);
 
 resetButton.addEventListener("click", resetTest);
 
-
 // =============================================
-// 12. TEST DURATION CHANGE
+// 13. TEST DURATION CHANGE
 // =============================================
 
 timeSelect.addEventListener("change", resetTest);
 
-
 // =============================================
-// 13. TEST LANGUAGE CHANGE
+// 14. TEST LANGUAGE CHANGE
 // =============================================
 
 languageSelect.addEventListener("change", function () {
@@ -312,18 +383,16 @@ languageSelect.addEventListener("change", function () {
 
 });
 
-
 // =============================================
-// 14. PRACTICE VARIABLES
+// 15. PRACTICE VARIABLES
 // =============================================
 
 let practiceStartTime = null;
 
 let practiceFinished = false;
 
-
 // =============================================
-// 15. RESET PRACTICE
+// 16. RESET PRACTICE
 // =============================================
 
 function resetPractice() {
@@ -346,12 +415,10 @@ function resetPractice() {
 
     practiceText.textContent =
         practiceTexts[practiceLevel.value];
-
 }
 
-
 // =============================================
-// 16. UPDATE PRACTICE STATISTICS
+// 17. UPDATE PRACTICE STATISTICS
 // =============================================
 
 function updatePracticeStatistics() {
@@ -379,12 +446,10 @@ function updatePracticeStatistics() {
         stats.accuracy + "%";
 
     practiceErrors.textContent = stats.errors;
-
 }
 
-
 // =============================================
-// 17. PRACTICE INPUT EVENT
+// 18. PRACTICE INPUT EVENT
 // =============================================
 
 practiceInput.addEventListener("input", function () {
@@ -400,13 +465,10 @@ practiceInput.addEventListener("input", function () {
         practiceErrors.textContent = "0";
 
         return;
-
     }
 
     if (practiceStartTime === null) {
-
         practiceStartTime = Date.now();
-
     }
 
     updatePracticeStatistics();
@@ -425,14 +487,11 @@ practiceInput.addEventListener("input", function () {
             "Excellent! Practice completed. Your speed was " +
             practiceWpm.textContent +
             " WPM.";
-
     }
-
 });
 
-
 // =============================================
-// 18. PRACTICE DIFFICULTY CHANGE
+// 19. PRACTICE DIFFICULTY CHANGE
 // =============================================
 
 practiceLevel.addEventListener("change", function () {
@@ -441,9 +500,8 @@ practiceLevel.addEventListener("change", function () {
 
 });
 
-
 // =============================================
-// 19. PRACTICE RESTART BUTTON
+// 20. PRACTICE RESTART BUTTON
 // =============================================
 
 practiceReset.addEventListener("click", function () {
@@ -454,9 +512,8 @@ practiceReset.addEventListener("click", function () {
 
 });
 
-
 // =============================================
-// 20. INITIALIZE WEBSITE
+// 21. INITIALIZE WEBSITE
 // =============================================
 
 resetTest();
@@ -464,4 +521,3 @@ resetTest();
 resetPractice();
 
 console.log("TypeMaster initialized successfully!");
-
