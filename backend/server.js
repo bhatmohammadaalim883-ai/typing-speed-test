@@ -19,25 +19,25 @@ if (!JWT_SECRET || !process.env.DATABASE_URL) {
     process.exit(1);
 }
 
-// ===============================
-// Middleware
-// ===============================
+// ===================================
+// MIDDLEWARE
+// ===================================
 
 app.use(cors());
 app.use(express.json({ limit: "10kb" }));
 
-// ===============================
-// PostgreSQL Connection
-// ===============================
+// ===================================
+// POSTGRESQL CONNECTION
+// ===================================
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
-// ===============================
-// Rate Limiters
-// ===============================
+// ===================================
+// RATE LIMITERS
+// ===================================
 
 const registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
@@ -61,9 +61,9 @@ const loginLimiter = rateLimit({
     }
 });
 
-// ===============================
-// Database Initialization
-// ===============================
+// ===================================
+// DATABASE INITIALIZATION
+// ===================================
 
 async function initializeDatabase() {
     await pool.query(`
@@ -99,9 +99,9 @@ async function initializeDatabase() {
     console.log("Database tables initialized successfully.");
 }
 
-// ===============================
-// Authentication Middleware
-// ===============================
+// ===================================
+// AUTHENTICATION MIDDLEWARE
+// ===================================
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -138,9 +138,9 @@ function authenticateToken(req, res, next) {
     }
 }
 
-// ===============================
-// Home Route
-// ===============================
+// ===================================
+// HOME ROUTE
+// ===================================
 
 app.get("/", (req, res) => {
     res.json({
@@ -149,9 +149,9 @@ app.get("/", (req, res) => {
     });
 });
 
-// ===============================
-// Health Check
-// ===============================
+// ===================================
+// HEALTH CHECK
+// ===================================
 
 app.get("/api/health", (req, res) => {
     res.json({
@@ -160,9 +160,9 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-// ===============================
-// Database Health Check
-// ===============================
+// ===================================
+// DATABASE HEALTH CHECK
+// ===================================
 
 app.get("/api/db-health", async (req, res) => {
     try {
@@ -190,9 +190,9 @@ app.get("/api/db-health", async (req, res) => {
     }
 });
 
-// ===============================
-// User Registration
-// ===============================
+// ===================================
+// USER REGISTRATION
+// ===================================
 
 app.post(
     "/api/auth/register",
@@ -284,9 +284,9 @@ app.post(
     }
 );
 
-// ===============================
-// User Login
-// ===============================
+// ===================================
+// USER LOGIN
+// ===================================
 
 app.post(
     "/api/auth/login",
@@ -365,9 +365,9 @@ app.post(
     }
 );
 
-// ===============================
-// Get Logged-in User Profile
-// ===============================
+// ===================================
+// GET LOGGED-IN USER PROFILE
+// ===================================
 
 app.get("/api/auth/me", authenticateToken, async (req, res) => {
     try {
@@ -405,9 +405,9 @@ app.get("/api/auth/me", authenticateToken, async (req, res) => {
     }
 });
 
-// ===============================
-// Save Typing Test Result
-// ===============================
+// ===================================
+// SAVE TYPING TEST RESULT
+// ===================================
 
 app.post(
     "/api/typing-tests",
@@ -419,6 +419,7 @@ app.post(
             const testWpm = Number(wpm);
             const testAccuracy = Number(accuracy);
             const testDuration = Number(duration_seconds);
+
             const testLanguage = language === undefined
                 ? "English"
                 : language;
@@ -499,9 +500,9 @@ app.post(
     }
 );
 
-// ===============================
-// Get Typing Statistics
-// ===============================
+// ===================================
+// GET TYPING STATISTICS
+// ===================================
 
 app.get(
     "/api/typing-tests/stats",
@@ -546,9 +547,75 @@ app.get(
     }
 );
 
-// ===============================
-// Start Server
-// ===============================
+// ===================================
+// GLOBAL LEADERBOARD
+// ===================================
+
+app.get("/api/leaderboard", async (req, res) => {
+    try {
+        const period = req.query.period || "all-time";
+
+        let dateCondition = "";
+
+        if (period === "daily") {
+            dateCondition =
+                "AND tt.created_at >= NOW() - INTERVAL '1 day'";
+
+        } else if (period === "weekly") {
+            dateCondition =
+                "AND tt.created_at >= NOW() - INTERVAL '7 days'";
+
+        } else if (period !== "all-time") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid leaderboard period."
+            });
+        }
+
+        const query = `
+            SELECT
+                u.username,
+                COUNT(*)::INTEGER AS total_tests,
+                ROUND(AVG(tt.wpm)::numeric, 1) AS average_wpm,
+                ROUND(AVG(tt.accuracy)::numeric, 1) AS average_accuracy
+
+            FROM typing_tests tt
+
+            INNER JOIN users u
+                ON u.id = tt.user_id
+
+            WHERE 1=1
+            ${dateCondition}
+
+            GROUP BY u.id, u.username
+
+            ORDER BY
+                AVG(tt.wpm) DESC,
+                AVG(tt.accuracy) DESC,
+                COUNT(*) DESC
+        `;
+
+        const result = await pool.query(query);
+
+        res.json({
+            success: true,
+            period,
+            leaderboard: result.rows
+        });
+
+    } catch (error) {
+        console.error("Leaderboard error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to load leaderboard."
+        });
+    }
+});
+
+// ===================================
+// START SERVER
+// ===================================
 
 async function startServer() {
     try {
