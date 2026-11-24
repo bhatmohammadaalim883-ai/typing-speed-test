@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Challenges | TypeMaster</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="challenges.css">
+</head>
+<body>
+
+    <header class="challenges-header">
+        <a href="index.html" class="challenges-logo">TypeMaster</a>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="games.html">Games</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="coach.html">AI Coach</a>
+        </nav>
+    </header>
+
+    <main class="challenges-container">
+
+        <section class="challenges-intro">
+            <span class="challenge-badge">DAILY MISSION</span>
+            <h1>Daily Typing Challenges</h1>
+            <p>Complete daily missions, improve your typing skills and earn points.</p>
+        </section>
+
+        <section class="challenge-overview">
+            <div class="overview-card">
+                <span>Challenges Completed</span>
+                <strong id="completedCount">0</strong>
+            </div>
+
+            <div class="overview-card">
+                <span>Total Points</span>
+                <strong id="totalPoints">0</strong>
+            </div>
+
+            <div class="overview-card">
+                <span>Current Streak</span>
+                <strong id="currentStreak">0 days</strong>
+            </div>
+        </section>
+
+        <section class="daily-challenge-card">
+            <div class="challenge-heading">
+                <div>
+                    <span class="challenge-label">TODAY'S CHALLENGE</span>
+                    <h2 id="challengeTitle">Accuracy Master</h2>
+                </div>
+                <span class="challenge-points" id="challengePoints">+50 Points</span>
+            </div>
+
+            <p id="challengeDescription">
+                Complete a typing challenge while maintaining excellent accuracy.
+            </p>
+
+            <div class="challenge-targets">
+                <div>
+                    <span>Target Speed</span>
+                    <strong id="targetWpm">30 WPM</strong>
+                </div>
+
+                <div>
+                    <span>Target Accuracy</span>
+                    <strong id="targetAccuracy">95%</strong>
+                </div>
+
+                <div>
+                    <span>Duration</span>
+                    <strong id="targetDuration">60 Seconds</strong>
+                </div>
+            </div>
+
+            <button id="startChallengeBtn">
+                Start Today's Challenge
+            </button>
+
+            <p id="challengeStatus" class="challenge-status">
+                Not completed yet
+            </p>
+        </section>
+
+        <section class="challenge-history">
+            <h2>Your Challenge History</h2>
+            <div id="historyList">
+                <p>No challenges completed yet.</p>
+            </div>
+        </section>
+
+        <section class="challenge-info">
+            <h2>How it works</h2>
+            <ul>
+                <li>Every day brings a new typing mission.</li>
+                <li>Meet the speed and accuracy targets.</li>
+                <li>Earn points when you complete a challenge.</li>
+                <li>Build a consistent daily practice habit.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <script src="challenges.js"></script>
+</body>
+</html>
