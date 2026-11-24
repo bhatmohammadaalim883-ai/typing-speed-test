@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard | TypeMaster</title>
+  <link rel="stylesheet" href="leaderboard.css">
+</head>
+<body>
+
+<header class="navbar">
+  <a href="index.html" class="logo">TypeMaster</a>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="typing-test.html">Typing Test</a>
+    <a href="games.html">Games</a>
+    <a href="leaderboard.html" class="active">Leaderboard</a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+    <span class="tag">GLOBAL COMPETITION</span>
+    <h1>Leaderboard 🏆</h1>
+    <p>Compete with other typists and see where you rank.</p>
+  </section>
+
+  <section class="filters">
+    <label for="period">Ranking period</label>
+    <select id="period">
+      <option value="all-time">All Time</option>
+      <option value="weekly">This Week</option>
+      <option value="daily">Today</option>
+    </select>
+
+    <button id="refreshBtn">Refresh Rankings</button>
+  </section>
+
+  <section class="my-ranking" id="myRanking">
+    <h2>Your Ranking</h2>
+    <p id="myRankText">Log in to see your ranking.</p>
+  </section>
+
+  <section class="leaderboard-card">
+    <div class="table-heading">
+      <div>
+        <h2>Top Typists</h2>
+        <p>Ranked by average words per minute</p>
+      </div>
+      <span class="live-label">GLOBAL</span>
+    </div>
+
+    <div id="leaderboardMessage" aria-live="polite">
+      Loading leaderboard...
+    </div>
+
+    <div class="table-wrapper">
+      <table id="leaderboardTable" hidden>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Username</th>
+            <th>Tests</th>
+            <th>Average WPM</th>
+            <th>Accuracy</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script src="leaderboard.js"></script>
+</body>
+</html>
