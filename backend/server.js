@@ -2,7 +2,9 @@
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const { Pool } = require("pg");
+const { rateLimit } = require("express-rate-limit");
 require("dotenv").config();
 
 const app = express();
@@ -19,6 +21,29 @@ const pool = new Pool({
 
 pool.on("error", (error) => {
     console.error("Unexpected database error:", error.code || "UNKNOWN");
+});
+
+// Rate limiting
+const registrationLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 5,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many registration attempts. Try again later."
+    }
+});
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many login attempts. Try again later."
+    }
 });
 
 // Home route
@@ -65,107 +90,182 @@ app.get("/api/db-health", async (req, res) => {
     }
 });
 
-// User registration API
-app.post("/api/auth/register", async (req, res) => {
+// User registration
+app.post(
+    "/api/auth/register",
+    registrationLimiter,
+    async (req, res) => {
+        const body = req.body || {};
+        let { username, email, password } = body;
+
+        if (
+            typeof username !== "string" ||
+            typeof email !== "string" ||
+            typeof password !== "string"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Username, email and password are required."
+            });
+        }
+
+        username = username.trim().toLowerCase();
+        email = email.trim().toLowerCase();
+
+        if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+            return res.status(400).json({
+                success: false,
+                message: "Username must be 3-20 characters and contain only letters, numbers or underscores."
+            });
+        }
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email.length > 255 || !emailPattern.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid email address."
+            });
+        }
+
+        if (password.length < 8 || Buffer.byteLength(password, "utf8") > 72) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must contain 8-72 bytes."
+            });
+        }
+
+        try {
+            const passwordHash = await bcrypt.hash(password, 12);
+
+            const result = await pool.query(
+                `INSERT INTO users (username, email, password_hash)
+                 VALUES ($1, $2, $3)
+                 RETURNING id, username, email, created_at`,
+                [username, email, passwordHash]
+            );
+
+            const user = result.rows[0];
+
+            res.status(201).json({
+                success: true,
+                message: "Your TypeMaster account has been created!",
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    created_at: user.created_at
+                }
+            });
+
+        } catch (error) {
+            if (error.code === "23505") {
+                return res.status(409).json({
+                    success: false,
+                    message: "This username or email is already registered."
+                });
+            }
+
+            console.error("Registration failed:", error.code || "UNKNOWN");
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to create your account right now."
+            });
+        }
+    }
+);
+
+// User login
+app.post("/api/auth/login", loginLimiter, async (req, res) => {
     const body = req.body || {};
+    let { email, password } = body;
 
-    let { username, email, password } = body;
-
-    // Check required fields
-    if (
-        typeof username !== "string" ||
-        typeof email !== "string" ||
-        typeof password !== "string"
-    ) {
+    if (typeof email !== "string" || typeof password !== "string") {
         return res.status(400).json({
             success: false,
-            message: "Username, email and password are required."
+            message: "Email and password are required."
         });
     }
 
-    // Normalize username and email
-    username = username.trim().toLowerCase();
     email = email.trim().toLowerCase();
 
-    // Validate username
-    if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+    if (email.length > 255 || password.length === 0 ||
+        Buffer.byteLength(password, "utf8") > 72) {
         return res.status(400).json({
             success: false,
-            message: "Username must be 3-20 characters and contain only letters, numbers or underscores."
-        });
-    }
-
-    // Validate email
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (email.length > 255 || !emailPattern.test(email)) {
-        return res.status(400).json({
-            success: false,
-            message: "Please enter a valid email address."
-        });
-    }
-
-    // Validate password
-    if (password.length < 8) {
-        return res.status(400).json({
-            success: false,
-            message: "Password must contain at least 8 characters."
-        });
-    }
-
-    if (Buffer.byteLength(password, "utf8") > 72) {
-        return res.status(400).json({
-            success: false,
-            message: "Password is too long."
+            message: "Invalid email or password."
         });
     }
 
     try {
-        // Hash the password before storing it
-        const passwordHash = await bcrypt.hash(password, 12);
-
-        // Insert user into PostgreSQL
         const result = await pool.query(
-            `INSERT INTO users (username, email, password_hash)
-             VALUES ($1, $2, $3)
-             RETURNING id, username, email, created_at`,
-            [username, email, passwordHash]
+            `SELECT id, username, email, password_hash
+             FROM users
+             WHERE email = $1`,
+            [email]
         );
 
         const user = result.rows[0];
 
-        return res.status(201).json({
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password."
+            });
+        }
+
+        const passwordMatches = await bcrypt.compare(
+            password,
+            user.password_hash
+        );
+
+        if (!passwordMatches) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password."
+            });
+        }
+
+        const token = jwt.sign(
+            { sub: String(user.id) },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1h",
+                issuer: "typemaster-api",
+                audience: "typemaster-users"
+            }
+        );
+
+        res.json({
             success: true,
-            message: "Your TypeMaster account has been created!",
+            message: "Login successful!",
+            token,
+            expiresIn: "1h",
             user: {
                 id: user.id,
                 username: user.username,
-                email: user.email,
-                created_at: user.created_at
+                email: user.email
             }
         });
 
     } catch (error) {
-        // PostgreSQL unique constraint violation
-        if (error.code === "23505") {
-            return res.status(409).json({
-                success: false,
-                message: "This username or email is already registered."
-            });
-        }
+        console.error("Login failed:", error.code || "UNKNOWN");
 
-        console.error("Registration failed:", error.code || "UNKNOWN");
-
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: "Unable to create your account right now."
+            message: "Unable to log in right now."
         });
     }
 });
 
-// Initialize database and start server
+// Start server
 async function startServer() {
     try {
+        if (!process.env.DATABASE_URL || !process.env.JWT_SECRET) {
+            throw new Error("Required environment variables are missing.");
+        }
+
         await pool.query("SELECT 1");
 
         await pool.query(`
@@ -185,7 +285,7 @@ async function startServer() {
         });
 
     } catch (error) {
-        console.error("Server startup failed:", error.code || "UNKNOWN");
+        console.error("Server startup failed:", error.message);
         process.exit(1);
     }
 }
