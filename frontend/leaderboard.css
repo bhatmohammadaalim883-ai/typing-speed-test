@@ -1,0 +1,206 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6fb;
+  color: #172554;
+}
+
+.navbar {
+  background: #172554;
+  padding: 18px 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  color: white;
+  font-size: 25px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+}
+
+nav a.active {
+  color: #93c5fd;
+  font-weight: bold;
+}
+
+.container {
+  width: min(1100px, 92%);
+  margin: 35px auto;
+}
+
+.hero {
+  text-align: center;
+  padding: 35px 10px;
+}
+
+.tag {
+  color: #2563eb;
+  font-weight: bold;
+  letter-spacing: 2px;
+  font-size: 12px;
+}
+
+.hero h1 {
+  font-size: 38px;
+  margin: 15px 0;
+}
+
+.hero p,
+.table-heading p {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+
+.filters label {
+  font-weight: bold;
+}
+
+.filters select {
+  padding: 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+}
+
+button {
+  padding: 12px 18px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.88;
+}
+
+.my-ranking,
+.leaderboard-card {
+  background: white;
+  padding: 25px;
+  border-radius: 13px;
+  box-shadow: 0 4px 15px #0000000b;
+  margin-bottom: 25px;
+}
+
+.my-ranking h2 {
+  margin-bottom: 12px;
+}
+
+#myRankText {
+  color: #475569;
+  line-height: 1.6;
+}
+
+.table-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.table-heading h2 {
+  margin-bottom: 8px;
+}
+
+.live-label {
+  color: #166534;
+  background: #dcfce7;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 600px;
+}
+
+th,
+td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+}
+
+td {
+  font-size: 14px;
+}
+
+.rank {
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.username {
+  font-weight: bold;
+}
+
+#leaderboardMessage {
+  color: #64748b;
+  padding: 15px 0;
+}
+
+@media(max-width: 600px) {
+  .navbar {
+    justify-content: center;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .filters {
+    align-items: stretch;
+  }
+
+  .filters select,
+  .filters button {
+    width: 100%;
+  }
+}
