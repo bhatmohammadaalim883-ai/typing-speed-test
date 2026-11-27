@@ -2,6 +2,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     const coachForm = document.getElementById("coachForm");
 
+    if (!coachForm) return;
+
     coachForm.addEventListener("submit", (event) => {
         event.preventDefault();
 
@@ -12,10 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (
             !Number.isFinite(wpm) ||
             !Number.isFinite(accuracy) ||
+            !Number.isFinite(duration) ||
             wpm <= 0 ||
             wpm > 1000 ||
             accuracy < 0 ||
-            accuracy > 100
+            accuracy > 100 ||
+            duration <= 0
         ) {
             alert("Please enter valid typing results.");
             return;
@@ -32,6 +36,7 @@ function analysePerformance(wpm, accuracy, duration) {
     const practiceGoal = document.getElementById("practiceGoal");
 
     document.getElementById("resultWpm").textContent = wpm.toFixed(1);
+
     document.getElementById("resultAccuracy").textContent =
         accuracy.toFixed(1) + "%";
 
@@ -108,6 +113,7 @@ function analysePerformance(wpm, accuracy, duration) {
     }
 
     results.hidden = false;
+
     results.scrollIntoView({
         behavior: "smooth",
         block: "start"
