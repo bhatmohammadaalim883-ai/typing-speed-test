@@ -1,11 +1,11 @@
 
 {
-  "name": "typemaster-backend",
+  "name": "typemaster",
   "version": "1.0.0",
-  "description": "TypeMaster backend server",
-  "main": "server.js",
+  "description": "TypeMaster typing speed test platform",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node backend/server.js"
   },
   "dependencies": {
     "express": "^5.1.0",
