@@ -1,5 +1,5 @@
 
-const API_URL = "https://typing-speed-test-26ct.onrender.com";
+const API_URL = "";
 
 const periodSelect = document.getElementById("period");
 const refreshBtn = document.getElementById("refreshBtn");
@@ -26,12 +26,14 @@ async function loadMyProfile() {
     });
 
     if (!response.ok) {
-      myRankText.textContent = "Your login session may have expired. Please log in again.";
+      myRankText.textContent =
+        "Your login session may have expired. Please log in again.";
       return;
     }
 
     const data = await response.json();
     currentUsername = data.user?.username || null;
+
   } catch (error) {
     console.error("Profile error:", error);
   }
@@ -60,6 +62,7 @@ async function loadLeaderboard() {
     if (!Array.isArray(users) || users.length === 0) {
       leaderboardMessage.textContent =
         "No typing test results are available for this period yet.";
+
       myRankText.textContent = "No ranking available yet.";
       return;
     }
@@ -96,6 +99,7 @@ async function loadLeaderboard() {
 
   } catch (error) {
     console.error("Leaderboard error:", error);
+
     leaderboardMessage.textContent =
       "Unable to load rankings. Please try again later.";
   }
