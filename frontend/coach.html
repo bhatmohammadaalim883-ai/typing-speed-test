@@ -5,45 +5,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Typing Coach | TypeMaster</title>
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+    <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="coach.css">
 </head>
 <body>
 
-    <header class="coach-header">
-        <a href="index.html" class="coach-logo">TypeMaster</a>
-        <nav>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="typing-test.html">Typing Test</a>
-            <a href="games.html">Games</a>
-            <a href="leaderboard.html">Leaderboard</a>
-        </nav>
-    </header>
+<div class="dashboard-layout">
 
-    <main class="coach-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>TypeMaster</h2>
+            <span>Typing Platform</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="index.html">Dashboard</a>
+            <a href="account.html">Account</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="practice.html">Practice</a>
+            <a href="games.html">Typing Games</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="coach.html" class="active">AI Typing Coach</a>
+            <a href="challenges.html">Daily Challenges</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="account.html#settings">Account Settings</a>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <header class="dashboard-header">
+            <div>
+                <h1>AI Typing Coach</h1>
+                <p>Understand your performance and improve your typing skills.</p>
+            </div>
+        </header>
 
         <section class="coach-intro">
-            <span class="coach-tag">AI POWERED</span>
-            <h1>Your Personal AI Typing Coach</h1>
-            <p>Understand your typing performance and get personalised tips to improve.</p>
+            <span class="coach-tag">PERSONAL TYPING COACH</span>
+            <h2>Your Personal Typing Coach</h2>
+            <p>
+                Analyse your typing performance and receive personalised
+                suggestions to improve your speed and accuracy.
+            </p>
         </section>
 
         <section class="coach-card">
-            <h2>Typing Performance Analysis</h2>
-            <p>Enter your latest typing test results below.</p>
+            <div class="coach-section-heading">
+                <h2>Typing Performance Analysis</h2>
+                <p>Enter your latest typing test results below.</p>
+            </div>
 
             <form id="coachForm">
 
                 <div class="coach-input-group">
                     <label for="wpm">Typing Speed (WPM)</label>
-                    <input type="number" id="wpm" min="0" max="1000"
-                        step="0.1" placeholder="Example: 45" required>
+                    <input
+                        type="number"
+                        id="wpm"
+                        min="0"
+                        max="1000"
+                        step="0.1"
+                        placeholder="Example: 45"
+                        required
+                    >
                 </div>
 
                 <div class="coach-input-group">
                     <label for="accuracy">Accuracy (%)</label>
-                    <input type="number" id="accuracy" min="0" max="100"
-                        step="0.1" placeholder="Example: 95" required>
+                    <input
+                        type="number"
+                        id="accuracy"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        placeholder="Example: 95"
+                        required
+                    >
                 </div>
 
                 <div class="coach-input-group">
@@ -98,11 +143,25 @@
 
         <section class="coach-note">
             <h3>Remember</h3>
-            <p>Consistent practice and accurate typing are more important than speed alone.</p>
+            <p>
+                Consistent practice and accurate typing are more important
+                than speed alone.
+            </p>
         </section>
 
     </main>
+</div>
 
-    <script src="coach.js"></script>
+<script>
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    logoutBtn.addEventListener("click", () => {
+        sessionStorage.removeItem("typemaster_token");
+        window.location.href = "account.html";
+    });
+</script>
+
+<script src="coach.js"></script>
+
 </body>
 </html>
