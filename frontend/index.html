@@ -1,291 +1,161 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TypeMaster - Typing Speed Test</title>
+    <title>Dashboard | TypeMaster</title>
 
-    <meta name="description"
-        content="Improve your typing speed and accuracy with TypeMaster.">
-
-    <meta name="theme-color" content="#111827">
-
-    <!-- Website Logo / Favicon -->
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
-
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="icon" href="favicon.svg">
 </head>
 
 <body>
 
-    <!-- HEADER -->
-    <header>
+<div class="dashboard-container">
 
-        <nav class="navbar">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-            <div class="logo">
+        <div class="logo">
+            <h2>Type<span>Master</span></h2>
+        </div>
 
-                <svg
-                    width="42"
-                    height="42"
-                    viewBox="0 0 100 100"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="TypeMaster logo">
-
-                    <rect x="5" y="10" width="90" height="80"
-                        rx="18" fill="#2563EB"/>
-
-                    <rect x="17" y="22" width="66" height="56"
-                        rx="10" fill="#111827"/>
-
-                    <path d="M30 38H70M50 38V64"
-                        stroke="#38BDF8"
-                        stroke-width="8"
-                        stroke-linecap="round"/>
-
-                    <path d="M62 55L75 55L66 69"
-                        stroke="white"
-                        stroke-width="5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"/>
-
-                </svg>
-
-                <span>Type<span>Master</span></span>
-
-            </div>
-
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#test">Typing Test</a></li>
-                <li><a href="#practice">Practice</a></li>
-                <li><a href="#games">Games</a></li>
-                <li><a href="#leaderboard">Leaderboard</a></li>
-            </ul>
-
+        <nav>
+            <a href="index.html" class="active">Dashboard</a>
+            <a href="account.html">Account</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="practice.html">Practice</a>
+            <a href="games.html">Typing Games</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="coach.html">AI Typing Coach</a>
+            <a href="challenges.html">Daily Challenges</a>
+            <a href="#progress">My Progress</a>
+            <a href="account.html#settings">Account Settings</a>
         </nav>
 
-    </header>
+        <button id="logoutBtn" class="logout-btn">
+            Log Out
+        </button>
 
+    </aside>
 
     <!-- MAIN CONTENT -->
-    <main>
+    <main class="main-content">
 
-        <!-- HOME -->
-        <section id="home" class="hero">
+        <!-- HEADER -->
+        <header class="top-header">
 
-            <h1>Improve Your Typing Speed</h1>
+            <div>
+                <h1>Dashboard</h1>
+                <p>Your personal typing workspace.</p>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="username">User</span>
+            </div>
+
+        </header>
+
+        <!-- WELCOME -->
+        <section class="welcome-section">
+
+            <h2>
+                Welcome back,
+                <span id="welcomeName">User</span>!
+            </h2>
 
             <p>
-                Test your typing speed, improve your accuracy
-                and become a faster typist.
+                Ready to improve your typing speed and accuracy?
+                Let's make today productive.
             </p>
-
-            <a href="#test" class="start-link">
-                Start Typing Test
-            </a>
 
         </section>
 
+        <!-- STATISTICS -->
+        <section class="stats-section" id="progress">
 
-        <!-- TYPING TEST -->
-        <section id="test" class="typing-section">
-
-            <h2>Typing Speed Test</h2>
-
-            <p class="section-description">
-                Type the displayed paragraph as quickly and
-                accurately as possible.
-            </p>
-
-            <div class="test-settings">
-
-                <label for="time-select">Test Duration:</label>
-
-                <select id="time-select">
-                    <option value="15">15 Seconds</option>
-                    <option value="30" selected>30 Seconds</option>
-                    <option value="60">60 Seconds</option>
-                    <option value="120">120 Seconds</option>
-                </select>
-
-                <label for="language-select">Language:</label>
-
-                <select id="language-select">
-                    <option value="en">English</option>
-                    <option value="hi">Hindi</option>
-                    <option value="ur">Urdu</option>
-                </select>
-
+            <div class="stat-card">
+                <h3>Total Tests</h3>
+                <p id="totalTests">0</p>
             </div>
 
-            <div class="stats">
-
-                <div class="stat-box">
-                    <h3 id="timer">30</h3>
-                    <p>Time Left</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3 id="wpm">0</h3>
-                    <p>WPM</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3 id="accuracy">100%</h3>
-                    <p>Accuracy</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3 id="errors">0</h3>
-                    <p>Errors</p>
-                </div>
-
+            <div class="stat-card">
+                <h3>Average WPM</h3>
+                <p id="averageWpm">0</p>
             </div>
 
-            <div class="text-display" id="text-display">
-                The quick brown fox jumps over the lazy dog.
-                Practice every day to improve your typing speed
-                and accuracy.
+            <div class="stat-card">
+                <h3>Average Accuracy</h3>
+                <p id="averageAccuracy">0%</p>
             </div>
 
-            <textarea
-                id="typing-input"
-                placeholder="Click Start Test and type here..."
-                disabled
-                aria-label="Typing test input"></textarea>
-
-            <div class="test-buttons">
-
-                <button id="start-btn">Start Test</button>
-
-                <button id="reset-btn">Reset Test</button>
-
+            <div class="stat-card">
+                <h3>Membership</h3>
+                <p id="membership">Free</p>
             </div>
-
-            <p id="result-message"></p>
 
         </section>
 
+        <!-- QUICK ACTIONS -->
+        <section class="quick-actions">
 
-        <!-- TYPING PRACTICE -->
-        <section id="practice" class="typing-section">
+            <h2>Explore TypeMaster</h2>
 
-            <h2>Typing Practice</h2>
+            <div class="action-grid">
 
-            <p class="section-description">
-                Improve your typing skills with regular
-                practice exercises.
-            </p>
+                <a href="typing-test.html" class="action-card">
+                    <h3>Typing Test</h3>
+                    <p>Measure your typing speed and accuracy.</p>
+                </a>
 
-            <div class="test-settings">
+                <a href="practice.html" class="action-card">
+                    <h3>Practice Zone</h3>
+                    <p>Improve your typing with focused exercises.</p>
+                </a>
 
-                <label for="practice-level">Difficulty:</label>
+                <a href="games.html" class="action-card">
+                    <h3>Typing Games</h3>
+                    <p>Improve your skills through typing games.</p>
+                </a>
 
-                <select id="practice-level">
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
+                <a href="leaderboard.html" class="action-card">
+                    <h3>Leaderboard</h3>
+                    <p>See how you rank against other typists.</p>
+                </a>
 
-            </div>
+                <a href="coach.html" class="action-card">
+                    <h3>AI Typing Coach</h3>
+                    <p>Get guidance to improve your typing skills.</p>
+                </a>
 
-            <div class="text-display" id="practice-text">
-                Learning to type quickly requires patience
-                and regular practice. Start slowly and
-                focus on accuracy.
-            </div>
-
-            <textarea
-                id="practice-input"
-                placeholder="Start typing the passage here..."
-                aria-label="Typing practice input"></textarea>
-
-            <div class="stats">
-
-                <div class="stat-box">
-                    <h3 id="practice-wpm">0</h3>
-                    <p>WPM</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3 id="practice-accuracy">100%</h3>
-                    <p>Accuracy</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3 id="practice-errors">0</h3>
-                    <p>Errors</p>
-                </div>
+                <a href="challenges.html" class="action-card">
+                    <h3>Daily Challenges</h3>
+                    <p>Complete daily typing challenges.</p>
+                </a>
 
             </div>
-
-            <div class="test-buttons">
-                <button id="practice-reset">
-                    Restart Practice
-                </button>
-            </div>
-
-            <p id="practice-message"></p>
 
         </section>
 
+        <!-- RECENT ACTIVITY -->
+        <section class="recent-activity">
 
-        <!-- TYPING GAMES -->
-        <section id="games" class="feature-section">
+            <h2>Recent Activity</h2>
 
-            <h2>Typing Games</h2>
-
-            <p>
-                Learn typing through fun and interactive games.
-            </p>
-
-            <p>Exciting typing games are coming soon!</p>
-
-        </section>
-
-
-        <!-- LEADERBOARD -->
-        <section id="leaderboard" class="feature-section">
-
-            <h2>Leaderboard</h2>
-
-            <p>
-                Compete with other typists and improve your
-                personal records.
-            </p>
-
-            <p>Leaderboard coming soon!</p>
+            <div id="recentActivity">
+                <p>No typing tests completed yet.</p>
+            </div>
 
         </section>
 
     </main>
 
+</div>
 
-    <!-- FOOTER -->
-    <footer>
-
-        <p>
-            &copy; 2026 TypeMaster. All rights reserved.
-        </p>
-
-        <p>
-            Made to improve your typing skills.
-        </p>
-
-    </footer>
-
-
-    <!-- JAVASCRIPT -->
-    <script src="app.js"></script>
+<script src="dashboard.js"></script>
 
 </body>
-
 </html>
