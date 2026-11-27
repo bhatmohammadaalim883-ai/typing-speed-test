@@ -5,32 +5,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Challenges | TypeMaster</title>
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+    <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="challenges.css">
 </head>
 <body>
 
-    <header class="challenges-header">
-        <a href="index.html" class="challenges-logo">TypeMaster</a>
+<div class="dashboard-layout">
 
-        <nav>
-            <a href="dashboard.html">Dashboard</a>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>TypeMaster</h2>
+            <span>Typing Platform</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="index.html">Dashboard</a>
+            <a href="account.html">Account</a>
             <a href="typing-test.html">Typing Test</a>
-            <a href="games.html">Games</a>
+            <a href="practice.html">Practice</a>
+            <a href="games.html">Typing Games</a>
             <a href="leaderboard.html">Leaderboard</a>
-            <a href="coach.html">AI Coach</a>
+            <a href="coach.html">AI Typing Coach</a>
+            <a href="challenges.html" class="active">Daily Challenges</a>
         </nav>
-    </header>
 
-    <main class="challenges-container">
+        <div class="sidebar-bottom">
+            <a href="account.html#settings">Account Settings</a>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+    </aside>
 
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <header class="dashboard-header">
+            <div>
+                <h1>Daily Challenges</h1>
+                <p>Complete daily missions, improve your typing skills and earn points.</p>
+            </div>
+        </header>
+
+        <!-- Introduction -->
         <section class="challenges-intro">
             <span class="challenge-badge">DAILY MISSION</span>
-            <h1>Daily Typing Challenges</h1>
-            <p>Complete daily missions, improve your typing skills and earn points.</p>
+            <h2>Today's Typing Challenge</h2>
+            <p>
+                Take on a new typing mission every day.
+                Build consistency and track your progress.
+            </p>
         </section>
 
+        <!-- Overview -->
         <section class="challenge-overview">
+
             <div class="overview-card">
                 <span>Challenges Completed</span>
                 <strong id="completedCount">0</strong>
@@ -45,15 +75,21 @@
                 <span>Current Streak</span>
                 <strong id="currentStreak">0 days</strong>
             </div>
+
         </section>
 
+        <!-- Today's Challenge -->
         <section class="daily-challenge-card">
+
             <div class="challenge-heading">
                 <div>
                     <span class="challenge-label">TODAY'S CHALLENGE</span>
                     <h2 id="challengeTitle">Accuracy Master</h2>
                 </div>
-                <span class="challenge-points" id="challengePoints">+50 Points</span>
+
+                <span class="challenge-points" id="challengePoints">
+                    +50 Points
+                </span>
             </div>
 
             <p id="challengeDescription">
@@ -61,6 +97,7 @@
             </p>
 
             <div class="challenge-targets">
+
                 <div>
                     <span>Target Speed</span>
                     <strong id="targetWpm">30 WPM</strong>
@@ -75,6 +112,7 @@
                     <span>Duration</span>
                     <strong id="targetDuration">60 Seconds</strong>
                 </div>
+
             </div>
 
             <button id="startChallengeBtn">
@@ -84,17 +122,22 @@
             <p id="challengeStatus" class="challenge-status">
                 Not completed yet
             </p>
+
         </section>
 
+        <!-- Challenge History -->
         <section class="challenge-history">
             <h2>Your Challenge History</h2>
+
             <div id="historyList">
                 <p>No challenges completed yet.</p>
             </div>
         </section>
 
+        <!-- Information -->
         <section class="challenge-info">
-            <h2>How it works</h2>
+            <h2>How It Works</h2>
+
             <ul>
                 <li>Every day brings a new typing mission.</li>
                 <li>Meet the speed and accuracy targets.</li>
@@ -104,7 +147,18 @@
         </section>
 
     </main>
+</div>
 
-    <script src="challenges.js"></script>
+<script>
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    logoutBtn.addEventListener("click", () => {
+        sessionStorage.removeItem("typemaster_token");
+        window.location.href = "account.html";
+    });
+</script>
+
+<script src="challenges.js"></script>
+
 </body>
 </html>
