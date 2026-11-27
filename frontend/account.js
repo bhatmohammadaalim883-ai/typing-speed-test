@@ -3,10 +3,8 @@
 // TYPEMASTER ACCOUNT SYSTEM
 // ======================================
 
-// Use the same domain for frontend and backend
 const API_URL = "";
 
-// HTML elements
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 
@@ -78,9 +76,7 @@ function showMessage(element, message, type) {
 // ======================================
 
 document.querySelectorAll(".password-toggle").forEach(button => {
-
     button.addEventListener("click", () => {
-
         const input = document.getElementById(button.dataset.target);
 
         if (!input) return;
@@ -92,9 +88,7 @@ document.querySelectorAll(".password-toggle").forEach(button => {
             input.type = "password";
             button.textContent = "Show";
         }
-
     });
-
 });
 
 // ======================================
@@ -102,22 +96,12 @@ document.querySelectorAll(".password-toggle").forEach(button => {
 // ======================================
 
 registerForm.addEventListener("submit", async (event) => {
-
     event.preventDefault();
-
     clearMessages();
 
-    const username = document
-        .getElementById("registerUsername")
-        .value.trim();
-
-    const email = document
-        .getElementById("registerEmail")
-        .value.trim();
-
-    const password = document
-        .getElementById("registerPassword")
-        .value;
+    const username = document.getElementById("registerUsername").value.trim();
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
 
     if (!/^[a-z0-9_]{3,20}$/i.test(username)) {
         showMessage(
@@ -144,21 +128,16 @@ registerForm.addEventListener("submit", async (event) => {
     registerSubmit.textContent = "Creating Account...";
 
     try {
-
         const response = await fetch(`${API_URL}/api/auth/register`, {
-
             method: "POST",
-
             headers: {
                 "Content-Type": "application/json"
             },
-
             body: JSON.stringify({
                 username,
                 email,
                 password
             })
-
         });
 
         const data = await response.json();
@@ -176,15 +155,11 @@ registerForm.addEventListener("submit", async (event) => {
         registerForm.reset();
 
         setTimeout(() => {
-
             showLoginForm();
-
             document.getElementById("loginEmail").value = email;
-
         }, 1200);
 
     } catch (error) {
-
         showMessage(
             registerMessage,
             error.message || "Unable to connect to the server.",
@@ -192,12 +167,9 @@ registerForm.addEventListener("submit", async (event) => {
         );
 
     } finally {
-
         registerSubmit.disabled = false;
         registerSubmit.textContent = "Create Account";
-
     }
-
 });
 
 // ======================================
@@ -205,37 +177,25 @@ registerForm.addEventListener("submit", async (event) => {
 // ======================================
 
 loginForm.addEventListener("submit", async (event) => {
-
     event.preventDefault();
-
     clearMessages();
 
-    const email = document
-        .getElementById("loginEmail")
-        .value.trim();
-
-    const password = document
-        .getElementById("loginPassword")
-        .value;
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
 
     loginSubmit.disabled = true;
     loginSubmit.textContent = "Logging In...";
 
     try {
-
         const response = await fetch(`${API_URL}/api/auth/login`, {
-
             method: "POST",
-
             headers: {
                 "Content-Type": "application/json"
             },
-
             body: JSON.stringify({
                 email,
                 password
             })
-
         });
 
         const data = await response.json();
@@ -250,15 +210,12 @@ loginForm.addEventListener("submit", async (event) => {
             );
         }
 
-        // Store token for this browser tab session
         sessionStorage.setItem("typemaster_token", data.token);
 
-        loginForm.reset();
-
-        await loadUserProfile();
+        // Verify the login and user profile before redirecting.
+        await loadUserProfile(true);
 
     } catch (error) {
-
         showMessage(
             loginMessage,
             error.message || "Unable to connect to the server.",
@@ -266,62 +223,54 @@ loginForm.addEventListener("submit", async (event) => {
         );
 
     } finally {
-
         loginSubmit.disabled = false;
         loginSubmit.textContent = "Log In";
-
     }
-
 });
 
 // ======================================
 // LOAD USER PROFILE
 // ======================================
 
-async function loadUserProfile() {
-
+async function loadUserProfile(redirectToDashboard = false) {
     const token = sessionStorage.getItem("typemaster_token");
 
     if (!token) return;
 
     try {
-
         const response = await fetch(`${API_URL}/api/auth/me`, {
-
             method: "GET",
-
             headers: {
                 "Authorization": `Bearer ${token}`
             }
-
         });
 
         const data = await response.json();
 
-        if (!response.ok) {
-
+        if (!response.ok || !data.success) {
             sessionStorage.removeItem("typemaster_token");
 
             if (response.status === 401) {
-
                 showLoginForm();
-
                 showMessage(
                     loginMessage,
                     "Your session has expired. Please log in again.",
                     "error"
                 );
-
                 return;
             }
 
             throw new Error(data.message || "Unable to load profile.");
         }
 
+        if (redirectToDashboard) {
+            window.location.replace("index.html");
+            return;
+        }
+
         displayUserProfile(data.user);
 
     } catch (error) {
-
         console.error("Profile loading failed:", error.message);
 
         showLoginForm();
@@ -331,9 +280,7 @@ async function loadUserProfile() {
             "Unable to load your profile. Please try again.",
             "error"
         );
-
     }
-
 }
 
 // ======================================
@@ -341,7 +288,6 @@ async function loadUserProfile() {
 // ======================================
 
 function displayUserProfile(user) {
-
     loginForm.classList.add("hidden");
     registerForm.classList.add("hidden");
 
@@ -357,7 +303,6 @@ function displayUserProfile(user) {
 
     document.getElementById("profileAvatar").textContent =
         user.username.charAt(0).toUpperCase();
-
 }
 
 // ======================================
@@ -365,7 +310,6 @@ function displayUserProfile(user) {
 // ======================================
 
 logoutButton.addEventListener("click", () => {
-
     sessionStorage.removeItem("typemaster_token");
 
     profileSection.classList.add("hidden");
@@ -382,7 +326,6 @@ logoutButton.addEventListener("click", () => {
         "You have successfully logged out.",
         "success"
     );
-
 });
 
 // ======================================
@@ -390,9 +333,7 @@ logoutButton.addEventListener("click", () => {
 // ======================================
 
 document.addEventListener("DOMContentLoaded", () => {
-
     loadUserProfile();
-
 });
 
 console.log("TypeMaster account system initialized!");
