@@ -1,196 +1,191 @@
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    const API_URL = "https://typing-speed-test-26ct.onrender.com";
+
     const startButton = document.getElementById("startChallengeBtn");
+    const challengeTitle = document.getElementById("challengeTitle");
+    const challengeDescription = document.getElementById("challengeDescription");
+    const challengePoints = document.getElementById("challengePoints");
+    const targetWpm = document.getElementById("targetWpm");
+    const targetAccuracy = document.getElementById("targetAccuracy");
+    const targetDuration = document.getElementById("targetDuration");
+    const challengeStatus = document.getElementById("challengeStatus");
 
-    const challenges = [
-        {
-            title: "Accuracy Master",
-            description: "Complete a typing test with excellent accuracy.",
-            wpm: 30,
-            accuracy: 95,
-            duration: 60,
-            points: 50
-        },
-        {
-            title: "Speed Champion",
-            description: "Challenge yourself to reach a higher typing speed.",
-            wpm: 45,
-            accuracy: 90,
-            duration: 60,
-            points: 75
-        },
-        {
-            title: "Consistency Challenge",
-            description: "Maintain steady typing performance throughout your test.",
-            wpm: 35,
-            accuracy: 97,
-            duration: 120,
-            points: 100
-        },
-        {
-            title: "Typing Expert",
-            description: "Combine good speed with excellent accuracy.",
-            wpm: 55,
-            accuracy: 95,
-            duration: 60,
-            points: 125
-        },
-        {
-            title: "Practice Master",
-            description: "Complete a longer typing session with consistent accuracy.",
-            wpm: 40,
-            accuracy: 96,
-            duration: 120,
-            points: 100
+    const completedCount = document.getElementById("completedCount");
+    const totalPoints = document.getElementById("totalPoints");
+    const currentStreak = document.getElementById("currentStreak");
+    const historyList = document.getElementById("historyList");
+
+    const token = sessionStorage.getItem("typemaster_token");
+
+    let todayChallenge = null;
+    let challengeDate = null;
+
+    if (!token) {
+        showLoginMessage();
+        return;
+    }
+
+    startButton.disabled = true;
+    startButton.textContent = "Loading Challenge...";
+
+    try {
+        const response = await fetch(`${API_URL}/api/challenges/me`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Could not load challenges.");
         }
-    ];
 
-    const today = getLocalDateKey(new Date());
-    const challengeIndex = getDayNumber(today) % challenges.length;
-    const todayChallenge = challenges[challengeIndex];
+        todayChallenge = data.challenge;
+        challengeDate =
+            todayChallenge.date ||
+            todayChallenge.challenge_date ||
+            getIndiaDateKey();
 
-    let progress = loadProgress();
+        if (!todayChallenge) {
+            throw new Error("Today's challenge was not returned by the server.");
+        }
 
-    displayChallenge(todayChallenge);
-    updateOverview();
-    displayHistory();
+        displayChallenge(todayChallenge, data);
+        updateOverview(data);
+        displayHistory(data.history || []);
+
+    } catch (error) {
+        console.error("Challenge loading error:", error);
+
+        challengeStatus.textContent =
+            "Unable to load your challenge. Please refresh the page.";
+
+        startButton.disabled = true;
+        startButton.textContent = "Challenge Unavailable";
+    }
 
     startButton.addEventListener("click", () => {
+        if (!todayChallenge || !challengeDate) return;
+
         const params = new URLSearchParams({
             mode: "challenge",
-            date: today,
+            date: challengeDate,
             wpm: todayChallenge.wpm,
             accuracy: todayChallenge.accuracy,
             duration: todayChallenge.duration
         });
 
-        window.location.href = "typing-test.html?" + params.toString();
+        window.location.href =
+            "typing-test.html?" + params.toString();
     });
 
-    function displayChallenge(challenge) {
-        document.getElementById("challengeTitle").textContent =
-            challenge.title;
+    function displayChallenge(challenge, data) {
+        challengeTitle.textContent = challenge.title;
+        challengeDescription.textContent = challenge.description;
+        challengePoints.textContent = "+" + challenge.points + " Points";
 
-        document.getElementById("challengeDescription").textContent =
-            challenge.description;
-
-        document.getElementById("challengePoints").textContent =
-            "+" + challenge.points + " Points";
-
-        document.getElementById("targetWpm").textContent =
-            challenge.wpm + " WPM";
-
-        document.getElementById("targetAccuracy").textContent =
-            challenge.accuracy + "%";
-
-        document.getElementById("targetDuration").textContent =
+        targetWpm.textContent = challenge.wpm + " WPM";
+        targetAccuracy.textContent = challenge.accuracy + "%";
+        targetDuration.textContent =
             challenge.duration + " Seconds";
 
-        const completed = progress.completedDates.includes(today);
+        const completed =
+            data.completed === true ||
+            data.completedToday === true ||
+            data.isCompleted === true;
 
         if (completed) {
             startButton.disabled = true;
             startButton.textContent = "Challenge Completed";
-            document.getElementById("challengeStatus").textContent =
+
+            challengeStatus.textContent =
                 "You have completed today's challenge!";
+        } else {
+            startButton.disabled = false;
+            startButton.textContent = "Start Challenge";
+
+            challengeStatus.textContent =
+                "Complete today's typing challenge to earn points.";
         }
     }
 
-    function updateOverview() {
-        document.getElementById("completedCount").textContent =
-            progress.completedDates.length;
+    function updateOverview(data) {
+        completedCount.textContent =
+            data.completedCount ??
+            data.completed_count ??
+            (Array.isArray(data.history) ? data.history.length : 0);
 
-        document.getElementById("totalPoints").textContent =
-            progress.totalPoints;
+        totalPoints.textContent =
+            data.totalPoints ?? data.total_points ?? 0;
 
-        document.getElementById("currentStreak").textContent =
-            calculateStreak(progress.completedDates) + " days";
+        currentStreak.textContent =
+            (data.streak ?? data.currentStreak ?? 0) + " days";
     }
 
-    function displayHistory() {
-        const historyList = document.getElementById("historyList");
+    function displayHistory(history) {
         historyList.replaceChildren();
 
-        if (progress.history.length === 0) {
+        if (!Array.isArray(history) || history.length === 0) {
             const message = document.createElement("p");
             message.textContent = "No challenges completed yet.";
             historyList.appendChild(message);
             return;
         }
 
-        progress.history.forEach(item => {
+        history.forEach(item => {
             const row = document.createElement("div");
             row.className = "challenge-history-item";
 
             const title = document.createElement("strong");
-            title.textContent = item.title + " — " + item.date;
+            title.textContent =
+                (item.title || item.challenge_title || "Daily Challenge") +
+                " — " +
+                (item.date || item.challenge_date || "");
 
             const points = document.createElement("span");
-            points.textContent = "+" + item.points + " points";
+            points.textContent =
+                "+" + (item.points || 0) + " points";
 
             row.append(title, points);
             historyList.appendChild(row);
         });
     }
 
-    function loadProgress() {
-        try {
-            const saved = JSON.parse(
-                localStorage.getItem("typemaster_challenge_progress")
-            );
+    function showLoginMessage() {
+        challengeTitle.textContent = "Login Required";
+        challengeDescription.textContent =
+            "Please log in to access daily challenges and save your progress.";
 
-            if (
-                saved &&
-                Array.isArray(saved.completedDates) &&
-                Array.isArray(saved.history) &&
-                Number.isFinite(saved.totalPoints)
-            ) {
-                return saved;
-            }
-        } catch (error) {
-            console.warn("Could not load challenge progress:", error);
-        }
+        challengeStatus.textContent =
+            "Your challenge progress is connected to your account.";
 
-        return {
-            completedDates: [],
-            totalPoints: 0,
-            history: []
-        };
+        startButton.disabled = true;
+        startButton.textContent = "Login to Continue";
+
+        startButton.addEventListener("click", () => {
+            window.location.href = "account.html";
+        });
+
+        completedCount.textContent = "0";
+        totalPoints.textContent = "0";
+        currentStreak.textContent = "0 days";
+
+        historyList.replaceChildren();
+
+        const message = document.createElement("p");
+        message.textContent = "Log in to view your challenge history.";
+        historyList.appendChild(message);
     }
 
-    function getLocalDateKey(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-    }
-
-    function getDayNumber(dateString) {
-        const [year, month, day] = dateString.split("-").map(Number);
-        return Math.floor(
-            Date.UTC(year, month - 1, day) / 86400000
-        );
-    }
-
-    function calculateStreak(completedDates) {
-        const completed = new Set(completedDates);
-        const todayDate = new Date();
-
-        let streak = 0;
-        const todayKey = getLocalDateKey(todayDate);
-        const yesterday = new Date(todayDate);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        let checkDate = completed.has(todayKey)
-            ? todayDate
-            : yesterday;
-
-        while (completed.has(getLocalDateKey(checkDate))) {
-            streak++;
-            checkDate.setDate(checkDate.getDate() - 1);
-        }
-
-        return streak;
+    function getIndiaDateKey() {
+        return new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }).format(new Date());
     }
 });
