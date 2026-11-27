@@ -2,16 +2,20 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const path = require("path");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const rateLimit = require("express-rate-limit");
 
-dotenv.config();
+dotenv.config({
+    path: path.join(__dirname, ".env")
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET;
+const FRONTEND_DIR = path.join(__dirname, "../frontend");
 
 if (!JWT_SECRET || !process.env.DATABASE_URL) {
     console.error("Missing JWT_SECRET or DATABASE_URL.");
@@ -24,6 +28,9 @@ if (!JWT_SECRET || !process.env.DATABASE_URL) {
 
 app.use(cors());
 app.use(express.json({ limit: "10kb" }));
+
+// Serve frontend files
+app.use(express.static(FRONTEND_DIR));
 
 // =====================================
 // PostgreSQL
@@ -107,7 +114,10 @@ const dailyChallenges = [
     }
 ];
 
-// Use India Standard Time for daily challenges.
+// =====================================
+// Date Helpers
+// =====================================
+
 function getIndiaDateKey() {
     const parts = new Intl.DateTimeFormat("en-CA", {
         timeZone: "Asia/Kolkata",
@@ -135,7 +145,6 @@ function getDayNumber(dateString) {
 
 function getDailyChallenge(dateString) {
     const index = getDayNumber(dateString) % dailyChallenges.length;
-
     return dailyChallenges[index];
 }
 
@@ -265,14 +274,11 @@ function authenticateToken(req, res, next) {
 }
 
 // =====================================
-// Home Route
+// Frontend Home Page
 // =====================================
 
 app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "Welcome to the TypeMaster API!"
-    });
+    res.sendFile(path.join(FRONTEND_DIR, "index.html"));
 });
 
 // =====================================
@@ -821,8 +827,6 @@ app.post(
             const today = getIndiaDateKey();
             const challenge = getDailyChallenge(today);
 
-            // Only use a test belonging to this user,
-            // completed today, in India Standard Time.
             const testResult = await pool.query(
                 `SELECT id, wpm, accuracy, duration_seconds
                  FROM typing_tests
@@ -920,6 +924,55 @@ app.post(
 );
 
 // =====================================
+// Handle Unknown API Routes
+// =====================================
+
+app.use("/api", (req, res) => {
+    res.status(404).json({
+        success: false,
+        message: "API endpoint not found."
+    });
+});
+
+// =====================================
+// Frontend Fallback
+// =====================================
+
+app.use((req, res, next) => {
+    if (req.method !== "GET") {
+        return next();
+    }
+
+    if (path.extname(req.path)) {
+        return res.status(404).send("File not found.");
+    }
+
+    res.sendFile(
+        path.join(FRONTEND_DIR, "index.html"),
+        error => {
+            if (error) next(error);
+        }
+    );
+});
+
+// =====================================
+// Error Handler
+// =====================================
+
+app.use((error, req, res, next) => {
+    console.error("Server error:", error.message);
+
+    if (res.headersSent) {
+        return next(error);
+    }
+
+    res.status(500).json({
+        success: false,
+        message: "An unexpected server error occurred."
+    });
+});
+
+// =====================================
 // Start Server
 // =====================================
 
@@ -927,12 +980,14 @@ async function startServer() {
     try {
         await initializeDatabase();
 
-        app.listen(PORT, () => {
-            console.log(`TypeMaster server running on port ${PORT}`);
+        app.listen(PORT, "0.0.0.0", () => {
+            console.log(`TypeMaster running on port ${PORT}`);
+            console.log("Frontend and backend are served together.");
         });
 
     } catch (error) {
         console.error("Server startup failed:", error.message);
+        await pool.end();
         process.exit(1);
     }
 }
