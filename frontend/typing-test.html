@@ -2,152 +2,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Typing Test | TypeMaster</title>
-  <link rel="stylesheet" href="typing-test.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0B1020">
+    <title>Typing Test | TypeMaster</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="typing-test.css">
 </head>
 <body>
 
-<header class="navbar">
-  <a href="index.html" class="logo">TypeMaster</a>
+<div class="dashboard-container">
 
-  <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="typing-test.html" class="active">Typing Test</a>
-    <a href="games.html">Games</a>
-    <a href="leaderboard.html">Leaderboard</a>
-  </nav>
-</header>
+    <aside class="sidebar">
+        <div class="logo">TypeMaster</div>
 
-<main class="container">
+        <nav>
+            <a href="index.html">Dashboard</a>
+            <a href="account.html">Account</a>
+            <a href="typing-test.html" class="active">Typing Test</a>
+            <a href="practice.html">Practice</a>
+            <a href="games.html">Typing Games</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="coach.html">AI Typing Coach</a>
+            <a href="challenges.html">Daily Challenges</a>
+        </nav>
 
-  <section class="heading">
-    <h1>Typing Speed Test</h1>
-    <p>Choose your challenge and improve your typing skills.</p>
-  </section>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </aside>
 
-  <section class="settings">
+    <main class="main-content">
 
-    <div class="setting">
-      <label for="testMode">Test Mode</label>
-      <select id="testMode">
-        <option value="time">Time Challenge</option>
-        <option value="passage">Passage Test</option>
-        <option value="words">Word Challenge</option>
-        <option value="code">Code Typing</option>
-      </select>
-    </div>
+        <header class="top-header">
+            <div>
+                <h1>Typing Test</h1>
+                <p>Measure and improve your typing speed.</p>
+            </div>
+        </header>
 
-    <div class="setting">
-      <label for="duration">Duration</label>
-      <select id="duration">
-        <option value="15">15 Seconds</option>
-        <option value="30">30 Seconds</option>
-        <option value="60" selected>60 Seconds</option>
-        <option value="120">120 Seconds</option>
-      </select>
-    </div>
+        <div class="container">
 
-    <div class="setting">
-      <label for="difficulty">Difficulty</label>
-      <select id="difficulty">
-        <option value="easy">Beginner</option>
-        <option value="medium" selected>Intermediate</option>
-        <option value="hard">Advanced</option>
-      </select>
-    </div>
+            <section class="heading">
+                <h2>Typing Speed Test</h2>
+                <p>Choose your challenge and improve your typing skills.</p>
+            </section>
 
-    <div class="setting">
-      <label for="language">Language</label>
-      <select id="language">
-        <option value="English">English</option>
-        <option value="Hindi">Hindi</option>
-        <option value="Urdu">Urdu</option>
-      </select>
-    </div>
+            <section class="settings">
 
-  </section>
+                <div class="setting">
+                    <label for="testMode">Test Mode</label>
+                    <select id="testMode">
+                        <option value="time">Time Challenge</option>
+                        <option value="passage">Passage Test</option>
+                        <option value="words">Word Challenge</option>
+                        <option value="code">Code Typing</option>
+                    </select>
+                </div>
 
-  <section class="test-card">
+                <div class="setting">
+                    <label for="duration">Duration</label>
+                    <select id="duration">
+                        <option value="15">15 Seconds</option>
+                        <option value="30">30 Seconds</option>
+                        <option value="60" selected>60 Seconds</option>
+                        <option value="120">120 Seconds</option>
+                    </select>
+                </div>
 
-    <div class="stats">
-      <div class="stat">
-        <span id="timer">60</span>
-        <small>Seconds</small>
-      </div>
+                <div class="setting">
+                    <label for="difficulty">Difficulty</label>
+                    <select id="difficulty">
+                        <option value="easy">Beginner</option>
+                        <option value="medium" selected>Intermediate</option>
+                        <option value="hard">Advanced</option>
+                    </select>
+                </div>
 
-      <div class="stat">
-        <span id="wpm">0</span>
-        <small>WPM</small>
-      </div>
+                <div class="setting">
+                    <label for="language">Language</label>
+                    <select id="language">
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Urdu">Urdu</option>
+                    </select>
+                </div>
 
-      <div class="stat">
-        <span id="accuracy">100%</span>
-        <small>Accuracy</small>
-      </div>
+            </section>
 
-      <div class="stat">
-        <span id="errors">0</span>
-        <small>Errors</small>
-      </div>
-    </div>
+            <section class="test-card">
 
-    <div id="textDisplay" class="text-display">
-      The quick brown fox jumps over the lazy dog.
-    </div>
+                <div class="stats">
+                    <div class="stat">
+                        <span id="timer">60</span>
+                        <small>Seconds</small>
+                    </div>
 
-    <textarea
-      id="typingInput"
-      placeholder="Click Start Test and begin typing here..."
-      disabled
-      spellcheck="false"
-    ></textarea>
+                    <div class="stat">
+                        <span id="wpm">0</span>
+                        <small>WPM</small>
+                    </div>
 
-    <div class="actions">
-      <button id="startBtn">Start Test</button>
-      <button id="resetBtn" class="secondary">Reset</button>
-    </div>
+                    <div class="stat">
+                        <span id="accuracy">100%</span>
+                        <small>Accuracy</small>
+                    </div>
 
-    <p id="resultMessage" aria-live="polite"></p>
+                    <div class="stat">
+                        <span id="errors">0</span>
+                        <small>Errors</small>
+                    </div>
+                </div>
 
-  </section>
+                <div id="textDisplay" class="text-display">
+                    The quick brown fox jumps over the lazy dog.
+                </div>
 
-  <section class="practice-card">
-    <h2>Practice Zone</h2>
-    <p>Improve specific typing skills with focused exercises.</p>
+                <textarea
+                    id="typingInput"
+                    placeholder="Click Start Test and begin typing here..."
+                    disabled
+                    spellcheck="false"
+                ></textarea>
 
-    <div class="practice-options">
-      <button data-practice="sentences">Sentence Practice</button>
-      <button data-practice="numbers">Number Practice</button>
-      <button data-practice="symbols">Symbol Practice</button>
-      <button data-practice="difficult">Difficult Words</button>
-      <button data-practice="custom">Custom Text</button>
-    </div>
+                <div class="actions">
+                    <button id="startBtn">Start Test</button>
+                    <button id="resetBtn" class="secondary">Reset</button>
+                </div>
 
-    <div id="practiceArea">
-      <h3 id="practiceTitle">Sentence Practice</h3>
-      <p id="practiceText">Practice makes progress.</p>
+                <p id="resultMessage" aria-live="polite"></p>
 
-      <textarea
-        id="practiceInput"
-        placeholder="Type the practice text here..."
-        spellcheck="false"
-      ></textarea>
+            </section>
 
-      <div class="practice-stats">
-        <span>WPM: <strong id="practiceWpm">0</strong></span>
-        <span>Accuracy: <strong id="practiceAccuracy">100%</strong></span>
-        <span>Errors: <strong id="practiceErrors">0</strong></span>
-      </div>
+            <section class="practice-card">
+                <h2>Practice Zone</h2>
+                <p>Improve specific typing skills with focused exercises.</p>
 
-      <button id="practiceReset">Restart Practice</button>
-    </div>
-  </section>
+                <div class="practice-options">
+                    <button data-practice="sentences">Sentence Practice</button>
+                    <button data-practice="numbers">Number Practice</button>
+                    <button data-practice="symbols">Symbol Practice</button>
+                    <button data-practice="difficult">Difficult Words</button>
+                    <button data-practice="custom">Custom Text</button>
+                </div>
 
-</main>
+                <div id="practiceArea">
+                    <h3 id="practiceTitle">Sentence Practice</h3>
+                    <p id="practiceText">Practice makes progress.</p>
+
+                    <textarea
+                        id="practiceInput"
+                        placeholder="Type the practice text here..."
+                        spellcheck="false"
+                    ></textarea>
+
+                    <div class="practice-stats">
+                        <span>WPM: <strong id="practiceWpm">0</strong></span>
+                        <span>Accuracy: <strong id="practiceAccuracy">100%</strong></span>
+                        <span>Errors: <strong id="practiceErrors">0</strong></span>
+                    </div>
+
+                    <button id="practiceReset">Restart Practice</button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+</div>
 
 <script src="typing-test.js"></script>
+
+<script>
+    const logoutButton = document.getElementById("logoutBtn");
+
+    if (logoutButton) {
+        logoutButton.addEventListener("click", () => {
+            sessionStorage.removeItem("typemaster_token");
+            window.location.href = "account.html";
+        });
+    }
+</script>
+
 </body>
 </html>
-
