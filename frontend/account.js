@@ -3,8 +3,8 @@
 // TYPEMASTER ACCOUNT SYSTEM
 // ======================================
 
-// Your deployed backend URL
-const API_URL = "https://typing-speed-test-26ct.onrender.com";
+// Use the same domain for frontend and backend
+const API_URL = "";
 
 // HTML elements
 const loginForm = document.getElementById("loginForm");
@@ -25,7 +25,6 @@ const loginSubmit = document.getElementById("loginSubmit");
 const registerSubmit = document.getElementById("registerSubmit");
 
 const logoutButton = document.getElementById("logoutButton");
-
 
 // ======================================
 // SWITCH BETWEEN LOGIN AND REGISTER
@@ -57,7 +56,6 @@ registerTab.addEventListener("click", showRegisterForm);
 showRegister.addEventListener("click", showRegisterForm);
 showLogin.addEventListener("click", showLoginForm);
 
-
 // ======================================
 // MESSAGE HANDLING
 // ======================================
@@ -74,7 +72,6 @@ function showMessage(element, message, type) {
     element.textContent = message;
     element.className = `form-message ${type}`;
 }
-
 
 // ======================================
 // PASSWORD VISIBILITY
@@ -99,7 +96,6 @@ document.querySelectorAll(".password-toggle").forEach(button => {
     });
 
 });
-
 
 // ======================================
 // REGISTER NEW USER
@@ -132,7 +128,10 @@ registerForm.addEventListener("submit", async (event) => {
         return;
     }
 
-    if (password.length < 8 || new TextEncoder().encode(password).length > 72) {
+    if (
+        password.length < 8 ||
+        new TextEncoder().encode(password).length > 72
+    ) {
         showMessage(
             registerMessage,
             "Password must contain 8-72 bytes.",
@@ -177,6 +176,7 @@ registerForm.addEventListener("submit", async (event) => {
         registerForm.reset();
 
         setTimeout(() => {
+
             showLoginForm();
 
             document.getElementById("loginEmail").value = email;
@@ -199,7 +199,6 @@ registerForm.addEventListener("submit", async (event) => {
     }
 
 });
-
 
 // ======================================
 // LOGIN EXISTING USER
@@ -246,7 +245,9 @@ loginForm.addEventListener("submit", async (event) => {
         }
 
         if (!data.token) {
-            throw new Error("The server did not return an authentication token.");
+            throw new Error(
+                "The server did not return an authentication token."
+            );
         }
 
         // Store token for this browser tab session
@@ -273,7 +274,6 @@ loginForm.addEventListener("submit", async (event) => {
 
 });
 
-
 // ======================================
 // LOAD USER PROFILE
 // ======================================
@@ -299,9 +299,11 @@ async function loadUserProfile() {
         const data = await response.json();
 
         if (!response.ok) {
+
             sessionStorage.removeItem("typemaster_token");
 
             if (response.status === 401) {
+
                 showLoginForm();
 
                 showMessage(
@@ -334,7 +336,6 @@ async function loadUserProfile() {
 
 }
 
-
 // ======================================
 // DISPLAY USER PROFILE
 // ======================================
@@ -358,7 +359,6 @@ function displayUserProfile(user) {
         user.username.charAt(0).toUpperCase();
 
 }
-
 
 // ======================================
 // LOGOUT
@@ -385,7 +385,6 @@ logoutButton.addEventListener("click", () => {
 
 });
 
-
 // ======================================
 // CHECK EXISTING LOGIN SESSION
 // ======================================
@@ -395,3 +394,5 @@ document.addEventListener("DOMContentLoaded", () => {
     loadUserProfile();
 
 });
+
+console.log("TypeMaster account system initialized!");
