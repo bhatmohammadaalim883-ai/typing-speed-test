@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0B1020">
+    <title>Practice Zone | TypeMaster</title>
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="typing-test.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <aside class="sidebar">
+        <div class="logo">TypeMaster</div>
+
+        <nav>
+            <a href="index.html">Dashboard</a>
+            <a href="account.html">Account</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="practice.html" class="active">Practice</a>
+            <a href="games.html">Typing Games</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="coach.html">AI Typing Coach</a>
+            <a href="challenges.html">Daily Challenges</a>
+        </nav>
+
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="top-header">
+            <div>
+                <h1>Practice Zone</h1>
+                <p>Build better typing habits through focused exercises.</p>
+            </div>
+        </header>
+
+        <div class="container">
+
+            <section class="heading">
+                <h2>Choose Your Practice</h2>
+                <p>Select an exercise and start improving your typing skills.</p>
+            </section>
+
+            <section class="practice-card">
+
+                <div class="practice-options">
+                    <button data-practice="sentences">Sentence Practice</button>
+                    <button data-practice="numbers">Number Practice</button>
+                    <button data-practice="symbols">Symbol Practice</button>
+                    <button data-practice="difficult">Difficult Words</button>
+                    <button data-practice="custom">Custom Text</button>
+                </div>
+
+                <div id="practiceArea">
+
+                    <h3 id="practiceTitle">Sentence Practice</h3>
+
+                    <p id="practiceText">
+                        Practice every day to improve your typing speed.
+                    </p>
+
+                    <textarea
+                        id="practiceInput"
+                        placeholder="Type the practice text here..."
+                        spellcheck="false"
+                    ></textarea>
+
+                    <div class="practice-stats">
+                        <span>WPM: <strong id="practiceWpm">0</strong></span>
+                        <span>Accuracy: <strong id="practiceAccuracy">100%</strong></span>
+                        <span>Errors: <strong id="practiceErrors">0</strong></span>
+                    </div>
+
+                    <button id="practiceReset">Restart Practice</button>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="practice.js"></script>
+
+<script>
+    const logoutButton = document.getElementById("logoutBtn");
+
+    if (logoutButton) {
+        logoutButton.addEventListener("click", () => {
+            sessionStorage.removeItem("typemaster_token");
+            window.location.href = "account.html";
+        });
+    }
+</script>
+
+</body>
+</html>
