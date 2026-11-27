@@ -1,7 +1,17 @@
 
-const API_URL = "https://typing-speed-test-26ct.onrender.com";
+// ======================================
+// TYPEMASTER DASHBOARD
+// ======================================
+
+// Use the same domain for frontend and backend
+const API_URL = "";
+
+// ======================================
+// INITIALIZE DASHBOARD
+// ======================================
 
 document.addEventListener("DOMContentLoaded", () => {
+
     const logoutBtn = document.getElementById("logoutBtn");
 
     if (logoutBtn) {
@@ -9,13 +19,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadDashboard();
+
 });
 
-// ===============================
-// Load Dashboard
-// ===============================
+// ======================================
+// LOAD DASHBOARD
+// ======================================
 
 async function loadDashboard() {
+
     const token = sessionStorage.getItem("typemaster_token");
 
     if (!token) {
@@ -24,11 +36,14 @@ async function loadDashboard() {
     }
 
     try {
+
         // Get logged-in user
         const userResponse = await fetch(`${API_URL}/api/auth/me`, {
+
             headers: {
                 Authorization: `Bearer ${token}`
             }
+
         });
 
         if (userResponse.status === 401) {
@@ -48,31 +63,42 @@ async function loadDashboard() {
         await loadTypingStatistics(token);
 
     } catch (error) {
+
         console.error("Dashboard error:", error);
-        showActivityMessage("Could not load your dashboard. Please refresh.");
+
+        showActivityMessage(
+            "Could not load your dashboard. Please refresh."
+        );
+
     }
+
 }
 
-// ===============================
-// Display User Information
-// ===============================
+// ======================================
+// DISPLAY USER INFORMATION
+// ======================================
 
 function displayUser(user) {
+
     const username = user.username || "User";
 
     document.getElementById("username").textContent = username;
+
     document.getElementById("welcomeName").textContent = username;
 
     document.getElementById("userAvatar").textContent =
         username.charAt(0).toUpperCase();
+
 }
 
-// ===============================
-// Load Typing Statistics
-// ===============================
+// ======================================
+// LOAD TYPING STATISTICS
+// ======================================
 
 async function loadTypingStatistics(token) {
+
     try {
+
         const response = await fetch(
             `${API_URL}/api/typing-tests/stats`,
             {
@@ -94,21 +120,31 @@ async function loadTypingStatistics(token) {
         }
 
         displayStatistics(data.stats);
+
         displayRecentActivity(data.recentTests);
 
     } catch (error) {
+
         console.error("Statistics error:", error);
-        showActivityMessage("Typing statistics are temporarily unavailable.");
+
+        showActivityMessage(
+            "Typing statistics are temporarily unavailable."
+        );
+
     }
+
 }
 
-// ===============================
-// Display Statistics
-// ===============================
+// ======================================
+// DISPLAY STATISTICS
+// ======================================
 
 function displayStatistics(stats) {
+
     const totalTests = Number(stats.total_tests) || 0;
+
     const averageWpm = Number(stats.average_wpm) || 0;
+
     const averageAccuracy = Number(stats.average_accuracy) || 0;
 
     document.getElementById("totalTests").textContent = totalTests;
@@ -120,30 +156,39 @@ function displayStatistics(stats) {
         averageAccuracy.toFixed(1) + "%";
 
     document.getElementById("membership").textContent = "Free";
+
 }
 
-// ===============================
-// Display Recent Activity
-// ===============================
+// ======================================
+// DISPLAY RECENT ACTIVITY
+// ======================================
 
 function displayRecentActivity(tests) {
-    const activityContainer = document.getElementById("recentActivity");
+
+    const activityContainer =
+        document.getElementById("recentActivity");
 
     activityContainer.replaceChildren();
 
     if (!Array.isArray(tests) || tests.length === 0) {
+
         showActivityMessage("No typing tests completed yet.");
+
         return;
     }
 
     tests.forEach((test) => {
+
         const item = document.createElement("div");
+
         item.className = "activity-item";
 
         const details = document.createElement("div");
+
         details.className = "activity-details";
 
         const title = document.createElement("h3");
+
         title.textContent = `${test.language} Typing Test`;
 
         const date = document.createElement("p");
@@ -155,42 +200,58 @@ function displayRecentActivity(tests) {
             : parsedDate.toLocaleString("en-IN");
 
         const score = document.createElement("div");
+
         score.className = "activity-score";
 
         const wpm = document.createElement("span");
+
         wpm.textContent = `${Number(test.wpm).toFixed(1)} WPM`;
 
         const accuracy = document.createElement("span");
-        accuracy.textContent = `${Number(test.accuracy).toFixed(1)}% Accuracy`;
+
+        accuracy.textContent =
+            `${Number(test.accuracy).toFixed(1)}% Accuracy`;
 
         details.append(title, date);
+
         score.append(wpm, accuracy);
+
         item.append(details, score);
 
         activityContainer.appendChild(item);
+
     });
+
 }
 
-// ===============================
-// Activity Message
-// ===============================
+// ======================================
+// ACTIVITY MESSAGE
+// ======================================
 
 function showActivityMessage(message) {
+
     const container = document.getElementById("recentActivity");
 
     if (!container) return;
 
     const paragraph = document.createElement("p");
+
     paragraph.textContent = message;
 
     container.replaceChildren(paragraph);
+
 }
 
-// ===============================
-// Logout
-// ===============================
+// ======================================
+// LOGOUT
+// ======================================
 
 function logout() {
+
     sessionStorage.removeItem("typemaster_token");
+
     window.location.href = "account.html";
+
 }
+
+console.log("TypeMaster dashboard initialized successfully!");
