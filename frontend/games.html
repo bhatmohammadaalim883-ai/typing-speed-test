@@ -1,126 +1,177 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Typing Games | TypeMaster</title>
-  <link rel="stylesheet" href="games.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Typing Games | TypeMaster</title>
+
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="games.css">
+    <link rel="icon" href="favicon.svg">
 </head>
+
 <body>
 
-<header class="navbar">
-  <a href="index.html" class="logo">TypeMaster</a>
+<div class="dashboard-container">
 
-  <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="typing-test.html">Typing Test</a>
-    <a href="games.html" class="active">Games</a>
-    <a href="leaderboard.html">Leaderboard</a>
-  </nav>
-</header>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-<main class="container">
+        <div class="logo">
+            <h2>Type<span>Master</span></h2>
+        </div>
 
-  <section class="hero">
-    <span class="tag">TYPEMASTER ARCADE</span>
-    <h1>Typing Games</h1>
-    <p>Learn, compete and improve your typing skills through fun challenges.</p>
-  </section>
+        <nav>
+            <a href="index.html">Dashboard</a>
+            <a href="account.html">Account</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="practice.html">Practice</a>
+            <a href="games.html" class="active">Typing Games</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="coach.html">AI Typing Coach</a>
+            <a href="challenges.html">Daily Challenges</a>
+            <a href="index.html#progress">My Progress</a>
+            <a href="account.html#settings">Account Settings</a>
+        </nav>
 
-  <section class="game-stats">
-    <div class="stat-card">
-      <span id="gamesPlayed">0</span>
-      <p>Games Played</p>
-    </div>
+        <button id="logoutBtn" class="logout-btn">Log Out</button>
 
-    <div class="stat-card">
-      <span id="bestScore">0</span>
-      <p>Best Score</p>
-    </div>
+    </aside>
 
-    <div class="stat-card">
-      <span id="totalPoints">0</span>
-      <p>Total Points</p>
-    </div>
-  </section>
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
 
-  <section class="games-section">
-    <h2>Choose Your Game</h2>
+        <header class="top-header">
+            <div>
+                <h1>Typing Games</h1>
+                <p>Learn, compete and improve your typing skills.</p>
+            </div>
+        </header>
 
-    <div class="games-grid">
+        <section class="welcome-section">
+            <h2>Welcome to TypeMaster Arcade!</h2>
+            <p>Choose a game, challenge yourself and earn points through typing.</p>
+        </section>
 
-      <article class="game-card">
-        <div class="game-icon">🌧️</div>
-        <h3>Word Rain</h3>
-        <p>Type falling words before the timer runs out.</p>
-        <span class="difficulty easy">Easy</span>
-        <button data-game="wordRain">Play Now</button>
-      </article>
+        <!-- GAME STATISTICS -->
+        <section class="stats-section game-stats">
 
-      <article class="game-card">
-        <div class="game-icon">🏎️</div>
-        <h3>Typing Race</h3>
-        <p>Race against the clock with your typing speed.</p>
-        <span class="difficulty medium">Medium</span>
-        <button data-game="typingRace">Play Now</button>
-      </article>
+            <div class="stat-card">
+                <h3>Games Played</h3>
+                <p id="gamesPlayed">0</p>
+            </div>
 
-      <article class="game-card">
-        <div class="game-icon">🔤</div>
-        <h3>Word Scramble</h3>
-        <p>Unscramble letters to discover the correct word.</p>
-        <span class="difficulty medium">Medium</span>
-        <button data-game="wordScramble">Play Now</button>
-      </article>
+            <div class="stat-card">
+                <h3>Best Score</h3>
+                <p id="bestScore">0</p>
+            </div>
 
-      <article class="game-card">
-        <div class="game-icon">🎯</div>
-        <h3>Accuracy Challenge</h3>
-        <p>Type sentences correctly and earn points.</p>
-        <span class="difficulty hard">Hard</span>
-        <button data-game="accuracyChallenge">Play Now</button>
-      </article>
+            <div class="stat-card">
+                <h3>Total Points</h3>
+                <p id="totalPoints">0</p>
+            </div>
 
-    </div>
-  </section>
+        </section>
 
-  <section class="game-area" id="gameArea" hidden>
+        <!-- GAME SELECTION -->
+        <section class="games-section">
 
-    <div class="game-header">
-      <div>
-        <h2 id="gameTitle">Game</h2>
-        <p id="gameDescription">Get ready!</p>
-      </div>
+            <h2>Choose Your Game</h2>
 
-      <button id="closeGame" class="close-btn">Close</button>
-    </div>
+            <div class="games-grid">
 
-    <div class="game-info">
-      <div>Time: <strong id="gameTimer">60</strong>s</div>
-      <div>Score: <strong id="gameScore">0</strong></div>
-    </div>
+                <article class="game-card">
+                    <div class="game-icon">🌧️</div>
+                    <h3>Word Rain</h3>
+                    <p>Type words correctly before the timer runs out.</p>
+                    <span class="difficulty easy">Easy</span>
+                    <button data-game="wordRain">Play Now</button>
+                </article>
 
-    <div id="gameContent">
-      <p id="gamePrompt"></p>
+                <article class="game-card">
+                    <div class="game-icon">🏎️</div>
+                    <h3>Typing Race</h3>
+                    <p>Complete typing challenges against the clock.</p>
+                    <span class="difficulty medium">Medium</span>
+                    <button data-game="typingRace">Play Now</button>
+                </article>
 
-      <input
-        type="text"
-        id="gameInput"
-        placeholder="Type here..."
-        autocomplete="off"
-        spellcheck="false"
-      >
+                <article class="game-card">
+                    <div class="game-icon">🔤</div>
+                    <h3>Word Scramble</h3>
+                    <p>Unscramble letters to discover the correct word.</p>
+                    <span class="difficulty medium">Medium</span>
+                    <button data-game="wordScramble">Play Now</button>
+                </article>
 
-      <p id="gameFeedback" aria-live="polite"></p>
+                <article class="game-card">
+                    <div class="game-icon">🎯</div>
+                    <h3>Accuracy Challenge</h3>
+                    <p>Type sentences correctly and earn points.</p>
+                    <span class="difficulty hard">Hard</span>
+                    <button data-game="accuracyChallenge">Play Now</button>
+                </article>
 
-      <button id="startGame">Start Game</button>
-    </div>
+            </div>
 
-  </section>
+        </section>
 
-</main>
+        <!-- GAME AREA -->
+        <section class="game-area" id="gameArea" hidden>
+
+            <div class="game-header">
+                <div>
+                    <h2 id="gameTitle">Game</h2>
+                    <p id="gameDescription">Get ready!</p>
+                </div>
+
+                <button id="closeGame" class="close-btn">Close</button>
+            </div>
+
+            <div class="game-info">
+                <div>Time: <strong id="gameTimer">60</strong>s</div>
+                <div>Score: <strong id="gameScore">0</strong></div>
+            </div>
+
+            <div id="gameContent">
+
+                <p id="gamePrompt"></p>
+
+                <input
+                    type="text"
+                    id="gameInput"
+                    placeholder="Type here..."
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+
+                <p id="gameFeedback" aria-live="polite"></p>
+
+                <button id="startGame">Start Game</button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
 
 <script src="games.js"></script>
+
+<script>
+    const logoutButton = document.getElementById("logoutBtn");
+
+    if (logoutButton) {
+        logoutButton.addEventListener("click", () => {
+            sessionStorage.removeItem("typemaster_token");
+            window.location.href = "account.html";
+        });
+    }
+</script>
+
 </body>
 </html>
+```
