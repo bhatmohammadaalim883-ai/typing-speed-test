@@ -2,78 +2,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaderboard | TypeMaster</title>
-  <link rel="stylesheet" href="leaderboard.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Leaderboard | TypeMaster</title>
+
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="leaderboard.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
 </head>
+
 <body>
 
-<header class="navbar">
-  <a href="index.html" class="logo">TypeMaster</a>
-  <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="typing-test.html">Typing Test</a>
-    <a href="games.html">Games</a>
-    <a href="leaderboard.html" class="active">Leaderboard</a>
-  </nav>
-</header>
+<div class="dashboard-container">
 
-<main class="container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-  <section class="hero">
-    <span class="tag">GLOBAL COMPETITION</span>
-    <h1>Leaderboard 🏆</h1>
-    <p>Compete with other typists and see where you rank.</p>
-  </section>
+        <div class="logo">
+            <h2>Type<span>Master</span></h2>
+        </div>
 
-  <section class="filters">
-    <label for="period">Ranking period</label>
-    <select id="period">
-      <option value="all-time">All Time</option>
-      <option value="weekly">This Week</option>
-      <option value="daily">Today</option>
-    </select>
+        <nav>
+            <a href="index.html">Dashboard</a>
+            <a href="account.html">Account</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="practice.html">Practice</a>
+            <a href="games.html">Typing Games</a>
+            <a href="leaderboard.html" class="active">Leaderboard</a>
+            <a href="coach.html">AI Typing Coach</a>
+            <a href="challenges.html">Daily Challenges</a>
+            <a href="index.html#progress">My Progress</a>
+            <a href="account.html#settings">Account Settings</a>
+        </nav>
 
-    <button id="refreshBtn">Refresh Rankings</button>
-  </section>
+        <button id="logoutBtn" class="logout-btn">
+            Log Out
+        </button>
 
-  <section class="my-ranking" id="myRanking">
-    <h2>Your Ranking</h2>
-    <p id="myRankText">Log in to see your ranking.</p>
-  </section>
+    </aside>
 
-  <section class="leaderboard-card">
-    <div class="table-heading">
-      <div>
-        <h2>Top Typists</h2>
-        <p>Ranked by average words per minute</p>
-      </div>
-      <span class="live-label">GLOBAL</span>
-    </div>
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
 
-    <div id="leaderboardMessage" aria-live="polite">
-      Loading leaderboard...
-    </div>
+        <header class="top-header">
+            <div>
+                <h1>Leaderboard 🏆</h1>
+                <p>Compete with other typists and see where you rank.</p>
+            </div>
+        </header>
 
-    <div class="table-wrapper">
-      <table id="leaderboardTable" hidden>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Username</th>
-            <th>Tests</th>
-            <th>Average WPM</th>
-            <th>Accuracy</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboardBody"></tbody>
-      </table>
-    </div>
-  </section>
+        <!-- WELCOME -->
+        <section class="welcome-section">
+            <h2>Global Competition</h2>
+            <p>Improve your typing performance and climb the rankings.</p>
+        </section>
 
-</main>
+        <!-- RANKING FILTERS -->
+        <section class="leaderboard-filters">
+
+            <div class="filter-group">
+                <label for="period">Ranking Period</label>
+
+                <select id="period">
+                    <option value="all-time">All Time</option>
+                    <option value="weekly">This Week</option>
+                    <option value="daily">Today</option>
+                </select>
+            </div>
+
+            <button id="refreshBtn">
+                Refresh Rankings
+            </button>
+
+        </section>
+
+        <!-- PERSONAL RANKING -->
+        <section class="my-ranking" id="myRanking">
+
+            <h2>Your Ranking</h2>
+
+            <p id="myRankText">
+                Log in to see your ranking.
+            </p>
+
+        </section>
+
+        <!-- LEADERBOARD TABLE -->
+        <section class="leaderboard-card">
+
+            <div class="table-heading">
+                <div>
+                    <h2>Top Typists</h2>
+                    <p>Ranked by average words per minute.</p>
+                </div>
+
+                <span class="live-label">GLOBAL</span>
+            </div>
+
+            <div id="leaderboardMessage" aria-live="polite">
+                Loading leaderboard...
+            </div>
+
+            <div class="table-wrapper">
+
+                <table id="leaderboardTable" hidden>
+
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Tests</th>
+                            <th>Average WPM</th>
+                            <th>Accuracy</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="leaderboardBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
 
 <script src="leaderboard.js"></script>
+
+<script>
+    const logoutButton = document.getElementById("logoutBtn");
+
+    if (logoutButton) {
+        logoutButton.addEventListener("click", () => {
+            sessionStorage.removeItem("typemaster_token");
+            window.location.href = "account.html";
+        });
+    }
+</script>
+
 </body>
 </html>
