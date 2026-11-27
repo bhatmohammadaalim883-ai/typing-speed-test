@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0B1020">
 
     <title>Account | TypeMaster</title>
 
@@ -12,241 +12,260 @@
         content="Create your TypeMaster account or log in to continue improving your typing skills.">
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="account.css">
-
 </head>
 
 <body>
 
-    <header class="account-header">
+<div class="dashboard-container">
 
-        <a href="index.html" class="logo">
-            <span class="logo-icon">T</span>
-            <span>Type<span class="logo-highlight">Master</span></span>
-        </a>
+    <aside class="sidebar">
 
-        <a href="index.html" class="back-link">
-            Back to Home
-        </a>
+        <div class="logo">TypeMaster</div>
 
-    </header>
+        <nav>
+            <a href="index.html">Dashboard</a>
+            <a href="account.html" class="active">Account</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="practice.html">Practice</a>
+            <a href="games.html">Typing Games</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="coach.html">AI Typing Coach</a>
+            <a href="challenges.html">Daily Challenges</a>
+        </nav>
 
-    <main class="account-container">
+    </aside>
 
-        <section class="account-card">
+    <main class="main-content">
 
-            <div class="account-heading">
-
-                <div class="account-logo">T</div>
-
-                <h1>Welcome to TypeMaster</h1>
-
-                <p>
-                    Your journey towards better typing starts here.
-                </p>
-
+        <header class="top-header">
+            <div>
+                <h1>Account</h1>
+                <p>Manage your TypeMaster account.</p>
             </div>
+        </header>
 
-            <!-- ACCOUNT TABS -->
+        <div class="account-container">
 
-            <div class="account-tabs">
+            <section class="account-card">
 
-                <button
-                    type="button"
-                    id="loginTab"
-                    class="tab-button active">
-                    Log In
-                </button>
+                <div class="account-heading">
 
-                <button
-                    type="button"
-                    id="registerTab"
-                    class="tab-button">
-                    Sign Up
-                </button>
+                    <div class="account-logo">T</div>
 
-            </div>
+                    <h1>Welcome to TypeMaster</h1>
 
-            <!-- LOGIN FORM -->
-
-            <form id="loginForm" class="account-form">
-
-                <h2>Welcome Back!</h2>
-
-                <p class="form-description">
-                    Log in to your TypeMaster account.
-                </p>
-
-                <label for="loginEmail">
-                    Email Address
-                </label>
-
-                <input
-                    type="email"
-                    id="loginEmail"
-                    placeholder="Enter your email"
-                    autocomplete="email"
-                    required>
-
-                <label for="loginPassword">
-                    Password
-                </label>
-
-                <div class="password-wrapper">
-
-                    <input
-                        type="password"
-                        id="loginPassword"
-                        placeholder="Enter your password"
-                        autocomplete="current-password"
-                        required>
-
-                    <button
-                        type="button"
-                        class="password-toggle"
-                        data-target="loginPassword">
-                        Show
-                    </button>
+                    <p>
+                        Your journey towards better typing starts here.
+                    </p>
 
                 </div>
 
-                <button
-                    type="submit"
-                    class="submit-button"
-                    id="loginSubmit">
-                    Log In
-                </button>
-
-                <p class="form-message" id="loginMessage"
-                    role="status" aria-live="polite"></p>
-
-                <p class="switch-message">
-                    Don't have an account?
-                    <button type="button" class="text-button"
-                        id="showRegister">
-                        Sign Up
-                    </button>
-                </p>
-
-            </form>
-
-            <!-- REGISTRATION FORM -->
-
-            <form id="registerForm" class="account-form hidden">
-
-                <h2>Create Your Account</h2>
-
-                <p class="form-description">
-                    Join TypeMaster and track your progress.
-                </p>
-
-                <label for="registerUsername">
-                    Username
-                </label>
-
-                <input
-                    type="text"
-                    id="registerUsername"
-                    placeholder="Choose a username"
-                    minlength="3"
-                    maxlength="20"
-                    autocomplete="username"
-                    required>
-
-                <small>
-                    Use 3-20 letters, numbers or underscores.
-                </small>
-
-                <label for="registerEmail">
-                    Email Address
-                </label>
-
-                <input
-                    type="email"
-                    id="registerEmail"
-                    placeholder="Enter your email"
-                    autocomplete="email"
-                    required>
-
-                <label for="registerPassword">
-                    Password
-                </label>
-
-                <div class="password-wrapper">
-
-                    <input
-                        type="password"
-                        id="registerPassword"
-                        placeholder="Create a password"
-                        minlength="8"
-                        autocomplete="new-password"
-                        required>
+                <div class="account-tabs">
 
                     <button
                         type="button"
-                        class="password-toggle"
-                        data-target="registerPassword">
-                        Show
-                    </button>
-
-                </div>
-
-                <small>
-                    Password must contain at least 8 characters.
-                </small>
-
-                <button
-                    type="submit"
-                    class="submit-button"
-                    id="registerSubmit">
-                    Create Account
-                </button>
-
-                <p class="form-message" id="registerMessage"
-                    role="status" aria-live="polite"></p>
-
-                <p class="switch-message">
-                    Already have an account?
-                    <button type="button" class="text-button"
-                        id="showLogin">
+                        id="loginTab"
+                        class="tab-button active">
                         Log In
                     </button>
-                </p>
 
-            </form>
+                    <button
+                        type="button"
+                        id="registerTab"
+                        class="tab-button">
+                        Sign Up
+                    </button>
 
-            <!-- USER PROFILE -->
-
-            <section id="profileSection" class="profile-section hidden">
-
-                <div class="profile-avatar" id="profileAvatar">
-                    T
                 </div>
 
-                <h2>You're Logged In!</h2>
+                <!-- LOGIN FORM -->
 
-                <p id="profileUsername"></p>
+                <form id="loginForm" class="account-form">
 
-                <p id="profileEmail"></p>
+                    <h2>Welcome Back!</h2>
 
-                <button
-                    type="button"
-                    id="logoutButton"
-                    class="logout-button">
-                    Log Out
-                </button>
+                    <p class="form-description">
+                        Log in to your TypeMaster account.
+                    </p>
+
+                    <label for="loginEmail">Email Address</label>
+
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required>
+
+                    <label for="loginPassword">Password</label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="loginPassword">
+                            Show
+                        </button>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="submit-button"
+                        id="loginSubmit">
+                        Log In
+                    </button>
+
+                    <p class="form-message"
+                        id="loginMessage"
+                        role="status"
+                        aria-live="polite">
+                    </p>
+
+                    <p class="switch-message">
+                        Don't have an account?
+
+                        <button
+                            type="button"
+                            class="text-button"
+                            id="showRegister">
+                            Sign Up
+                        </button>
+                    </p>
+
+                </form>
+
+                <!-- REGISTRATION FORM -->
+
+                <form id="registerForm" class="account-form hidden">
+
+                    <h2>Create Your Account</h2>
+
+                    <p class="form-description">
+                        Join TypeMaster and track your progress.
+                    </p>
+
+                    <label for="registerUsername">Username</label>
+
+                    <input
+                        type="text"
+                        id="registerUsername"
+                        placeholder="Choose a username"
+                        minlength="3"
+                        maxlength="20"
+                        autocomplete="username"
+                        required>
+
+                    <small>
+                        Use 3-20 letters, numbers or underscores.
+                    </small>
+
+                    <label for="registerEmail">Email Address</label>
+
+                    <input
+                        type="email"
+                        id="registerEmail"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required>
+
+                    <label for="registerPassword">Password</label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            type="password"
+                            id="registerPassword"
+                            placeholder="Create a password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="registerPassword">
+                            Show
+                        </button>
+
+                    </div>
+
+                    <small>
+                        Password must contain at least 8 characters.
+                    </small>
+
+                    <button
+                        type="submit"
+                        class="submit-button"
+                        id="registerSubmit">
+                        Create Account
+                    </button>
+
+                    <p class="form-message"
+                        id="registerMessage"
+                        role="status"
+                        aria-live="polite">
+                    </p>
+
+                    <p class="switch-message">
+                        Already have an account?
+
+                        <button
+                            type="button"
+                            class="text-button"
+                            id="showLogin">
+                            Log In
+                        </button>
+                    </p>
+
+                </form>
+
+                <!-- USER PROFILE -->
+
+                <section id="profileSection" class="profile-section hidden">
+
+                    <div class="profile-avatar" id="profileAvatar">
+                        T
+                    </div>
+
+                    <h2>You're Logged In!</h2>
+
+                    <p id="profileUsername"></p>
+
+                    <p id="profileEmail"></p>
+
+                    <button
+                        type="button"
+                        id="logoutButton"
+                        class="logout-button">
+                        Log Out
+                    </button>
+
+                </section>
 
             </section>
 
-        </section>
+            <p class="account-footer">
+                &copy; 2026 TypeMaster. All rights reserved.
+            </p>
 
-        <p class="account-footer">
-            &copy; 2026 TypeMaster. All rights reserved.
-        </p>
+        </div>
 
     </main>
 
-    <script src="account.js"></script>
+</div>
+
+<script src="account.js"></script>
 
 </body>
 </html>
