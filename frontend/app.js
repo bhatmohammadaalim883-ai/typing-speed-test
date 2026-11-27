@@ -3,7 +3,8 @@
 // TYPEMASTER - TYPING SPEED TEST PLATFORM
 // =============================================
 
-const API_URL = "https://typing-speed-test-26ct.onrender.com";
+// Use the same domain for frontend and backend
+const API_URL = "";
 
 // =============================================
 // 1. SELECT HTML ELEMENTS
