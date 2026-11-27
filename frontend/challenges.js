@@ -1,6 +1,8 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const API_URL = "https://typing-speed-test-26ct.onrender.com";
+
+    // Same-origin backend connection
+    const API_URL = "";
 
     const startButton = document.getElementById("startChallengeBtn");
     const challengeTitle = document.getElementById("challengeTitle");
@@ -30,6 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     startButton.textContent = "Loading Challenge...";
 
     try {
+
         const response = await fetch(`${API_URL}/api/challenges/me`, {
             method: "GET",
             headers: {
@@ -44,20 +47,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         todayChallenge = data.challenge;
-        challengeDate =
-            todayChallenge.date ||
-            todayChallenge.challenge_date ||
-            getIndiaDateKey();
 
+        // Check that today's challenge exists before accessing its properties.
         if (!todayChallenge) {
             throw new Error("Today's challenge was not returned by the server.");
         }
+
+        challengeDate =
+            todayChallenge.date ||
+            todayChallenge.challenge_date ||
+            (typeof data.today === "string" ? data.today : null) ||
+            getIndiaDateKey();
 
         displayChallenge(todayChallenge, data);
         updateOverview(data);
         displayHistory(data.history || []);
 
     } catch (error) {
+
         console.error("Challenge loading error:", error);
 
         challengeStatus.textContent =
@@ -65,9 +72,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         startButton.disabled = true;
         startButton.textContent = "Challenge Unavailable";
+
     }
 
     startButton.addEventListener("click", () => {
+
         if (!todayChallenge || !challengeDate) return;
 
         const params = new URLSearchParams({
@@ -80,15 +89,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         window.location.href =
             "typing-test.html?" + params.toString();
+
     });
 
-    function displayChallenge(challenge, data) {
-        challengeTitle.textContent = challenge.title;
-        challengeDescription.textContent = challenge.description;
-        challengePoints.textContent = "+" + challenge.points + " Points";
+    // ======================================
+    // DISPLAY TODAY'S CHALLENGE
+    // ======================================
 
-        targetWpm.textContent = challenge.wpm + " WPM";
-        targetAccuracy.textContent = challenge.accuracy + "%";
+    function displayChallenge(challenge, data) {
+
+        challengeTitle.textContent = challenge.title;
+
+        challengeDescription.textContent =
+            challenge.description;
+
+        challengePoints.textContent =
+            "+" + challenge.points + " Points";
+
+        targetWpm.textContent =
+            challenge.wpm + " WPM";
+
+        targetAccuracy.textContent =
+            challenge.accuracy + "%";
+
         targetDuration.textContent =
             challenge.duration + " Seconds";
 
@@ -98,21 +121,33 @@ document.addEventListener("DOMContentLoaded", async () => {
             data.isCompleted === true;
 
         if (completed) {
+
             startButton.disabled = true;
+
             startButton.textContent = "Challenge Completed";
 
             challengeStatus.textContent =
                 "You have completed today's challenge!";
+
         } else {
+
             startButton.disabled = false;
+
             startButton.textContent = "Start Challenge";
 
             challengeStatus.textContent =
                 "Complete today's typing challenge to earn points.";
+
         }
+
     }
 
+    // ======================================
+    // UPDATE CHALLENGE OVERVIEW
+    // ======================================
+
     function updateOverview(data) {
+
         completedCount.textContent =
             data.completedCount ??
             data.completed_count ??
@@ -123,39 +158,63 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         currentStreak.textContent =
             (data.streak ?? data.currentStreak ?? 0) + " days";
+
     }
 
+    // ======================================
+    // DISPLAY CHALLENGE HISTORY
+    // ======================================
+
     function displayHistory(history) {
+
         historyList.replaceChildren();
 
         if (!Array.isArray(history) || history.length === 0) {
+
             const message = document.createElement("p");
-            message.textContent = "No challenges completed yet.";
+
+            message.textContent =
+                "No challenges completed yet.";
+
             historyList.appendChild(message);
+
             return;
         }
 
         history.forEach(item => {
+
             const row = document.createElement("div");
+
             row.className = "challenge-history-item";
 
             const title = document.createElement("strong");
+
             title.textContent =
                 (item.title || item.challenge_title || "Daily Challenge") +
                 " — " +
                 (item.date || item.challenge_date || "");
 
             const points = document.createElement("span");
+
             points.textContent =
                 "+" + (item.points || 0) + " points";
 
             row.append(title, points);
+
             historyList.appendChild(row);
+
         });
+
     }
 
+    // ======================================
+    // LOGIN REQUIRED MESSAGE
+    // ======================================
+
     function showLoginMessage() {
+
         challengeTitle.textContent = "Login Required";
+
         challengeDescription.textContent =
             "Please log in to access daily challenges and save your progress.";
 
@@ -163,6 +222,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Your challenge progress is connected to your account.";
 
         startButton.disabled = true;
+
         startButton.textContent = "Login to Continue";
 
         startButton.addEventListener("click", () => {
@@ -170,22 +230,35 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         completedCount.textContent = "0";
+
         totalPoints.textContent = "0";
+
         currentStreak.textContent = "0 days";
 
         historyList.replaceChildren();
 
         const message = document.createElement("p");
-        message.textContent = "Log in to view your challenge history.";
+
+        message.textContent =
+            "Log in to view your challenge history.";
+
         historyList.appendChild(message);
+
     }
 
+    // ======================================
+    // INDIA DATE
+    // ======================================
+
     function getIndiaDateKey() {
+
         return new Intl.DateTimeFormat("en-CA", {
             timeZone: "Asia/Kolkata",
             year: "numeric",
             month: "2-digit",
             day: "2-digit"
         }).format(new Date());
+
     }
+
 });
