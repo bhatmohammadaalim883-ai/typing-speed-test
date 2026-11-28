@@ -7,7 +7,23 @@
 const API_URL = "";
 
 // ======================================
-// 1. TYPING PASSAGES
+// 1. CHALLENGE MODE CONFIGURATION
+// ======================================
+
+const urlParams = new URLSearchParams(window.location.search);
+
+const isChallengeMode = urlParams.get("mode") === "challenge";
+
+const requestedChallengeDuration = Number(
+    urlParams.get("duration")
+);
+
+const challengeDuration = [60, 120].includes(requestedChallengeDuration)
+    ? requestedChallengeDuration
+    : 60;
+
+// ======================================
+// 2. TYPING PASSAGES
 // ======================================
 
 const passages = {
@@ -16,11 +32,13 @@ const passages = {
         medium: "The quick brown fox jumps over the lazy dog. Regular practice improves typing speed and accuracy.",
         hard: "Technology continues to transform communication, education, productivity and the way people interact with information."
     },
+
     Hindi: {
         easy: "अभ्यास से सफलता मिलती है।",
         medium: "नियमित अभ्यास करने से हमारी गति और सटीकता में सुधार होता है।",
         hard: "तकनीक ने शिक्षा, संचार और हमारे दैनिक जीवन में महत्वपूर्ण परिवर्तन किए हैं।"
     },
+
     Urdu: {
         easy: "محنت کامیابی کی کنجی ہے۔",
         medium: "مسلسل مشق سے ہماری رفتار اور درستگی میں بہتری آتی ہے۔",
@@ -29,7 +47,7 @@ const passages = {
 };
 
 // ======================================
-// 2. HTML ELEMENTS
+// 3. HTML ELEMENTS
 // ======================================
 
 const elements = {
@@ -49,7 +67,7 @@ const elements = {
 };
 
 // ======================================
-// 3. TEST VARIABLES
+// 4. TEST VARIABLES
 // ======================================
 
 let passage = "";
@@ -61,12 +79,18 @@ let running = false;
 let completed = false;
 
 // ======================================
-// 4. WORD PASSAGE GENERATOR
+// 5. WORD PASSAGE GENERATOR
 // ======================================
 
 function makeWordPassage(count) {
 
-    const easy = ["apple", "school", "happy", "water", "music"];
+    const easy = [
+        "apple",
+        "school",
+        "happy",
+        "water",
+        "music"
+    ];
 
     const medium = [
         "computer",
@@ -96,7 +120,7 @@ function makeWordPassage(count) {
 }
 
 // ======================================
-// 5. CODE PASSAGE GENERATOR
+// 6. CODE PASSAGE GENERATOR
 // ======================================
 
 function makeCodePassage() {
@@ -106,10 +130,37 @@ function makeCodePassage() {
 }
 
 // ======================================
-// 6. GET TYPING PASSAGE
+// 7. CHALLENGE PASSAGE GENERATOR
+// ======================================
+
+function makeChallengePassage() {
+
+    const language = elements.language.value;
+    const difficulty = elements.difficulty.value;
+
+    const basePassage =
+        passages[language]?.[difficulty] ||
+        passages.English.hard;
+
+    // Generate a long passage so the challenge
+    // does not finish before its timer expires.
+
+    return Array(40)
+        .fill(basePassage)
+        .join(" ");
+
+}
+
+// ======================================
+// 8. GET TYPING PASSAGE
 // ======================================
 
 function getPassage() {
+
+    // Challenge mode always uses a long passage.
+    if (isChallengeMode) {
+        return makeChallengePassage();
+    }
 
     const mode = elements.mode.value;
     const language = elements.language.value;
@@ -124,10 +175,11 @@ function getPassage() {
     }
 
     return passages[language][difficulty];
+
 }
 
 // ======================================
-// 7. RENDER PASSAGE
+// 9. RENDER PASSAGE
 // ======================================
 
 function renderPassage(typed = "") {
@@ -143,7 +195,9 @@ function renderPassage(typed = "") {
         if (i < typed.length) {
 
             span.className =
-                typed[i] === passage[i] ? "correct" : "incorrect";
+                typed[i] === passage[i]
+                    ? "correct"
+                    : "incorrect";
 
         }
 
@@ -154,7 +208,7 @@ function renderPassage(typed = "") {
 }
 
 // ======================================
-// 8. CALCULATE TYPING STATISTICS
+// 10. CALCULATE TYPING STATISTICS
 // ======================================
 
 function calculateStats(text, seconds) {
@@ -189,7 +243,7 @@ function calculateStats(text, seconds) {
 }
 
 // ======================================
-// 9. UPDATE TYPING STATISTICS
+// 11. UPDATE TYPING STATISTICS
 // ======================================
 
 function updateStats() {
@@ -201,7 +255,8 @@ function updateStats() {
 
     elements.wpm.textContent = stats.wpm;
 
-    elements.accuracy.textContent = stats.accuracy + "%";
+    elements.accuracy.textContent =
+        stats.accuracy + "%";
 
     elements.errors.textContent = stats.errors;
 
@@ -212,7 +267,7 @@ function updateStats() {
 }
 
 // ======================================
-// 10. RESET TYPING TEST
+// 12. RESET TYPING TEST
 // ======================================
 
 function resetTest() {
@@ -223,6 +278,7 @@ function resetTest() {
     completed = false;
 
     timeLeft = Number(elements.duration.value);
+
     elapsedSeconds = 0;
     startedAt = null;
 
@@ -246,67 +302,176 @@ function resetTest() {
 }
 
 // ======================================
-// 11. SAVE RESULT TO DATABASE
+// 13. SAVE RESULT TO DATABASE
 // ======================================
 
 async function saveResult(stats) {
 
-    const token = sessionStorage.getItem("typemaster_token");
+    const token = sessionStorage.getItem(
+        "typemaster_token"
+    );
 
     if (!token) {
-        return "Log in to save this result to your account.";
+
+        return {
+            success: false,
+            message: "Log in to save this result to your account.",
+            testId: null
+        };
+
     }
 
     try {
 
-        const response = await fetch(`${API_URL}/api/typing-tests`, {
+        const response = await fetch(
+            `${API_URL}/api/typing-tests`,
+            {
+                method: "POST",
 
-            method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
 
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-
-            body: JSON.stringify({
-                wpm: stats.wpm,
-                accuracy: stats.accuracy,
-                duration_seconds: elapsedSeconds,
-                language: elements.language.value
-            })
-
-        });
+                body: JSON.stringify({
+                    wpm: stats.wpm,
+                    accuracy: stats.accuracy,
+                    duration_seconds: elapsedSeconds,
+                    language: elements.language.value
+                })
+            }
+        );
 
         const data = await response.json();
 
         if (response.status === 401) {
 
-            sessionStorage.removeItem("typemaster_token");
+            sessionStorage.removeItem(
+                "typemaster_token"
+            );
 
-            return "Your login session expired. Please log in again.";
+            return {
+                success: false,
+                message: "Your login session expired. Please log in again.",
+                testId: null
+            };
 
         }
 
         if (!response.ok || !data.success) {
 
-            return data.message || "Could not save your result.";
+            return {
+                success: false,
+                message: data.message ||
+                    "Could not save your result.",
+                testId: null
+            };
 
         }
 
-        return "Your typing result was saved successfully!";
+        return {
+            success: true,
+            message: "Your typing result was saved successfully!",
+            testId: data.test?.id || null
+        };
 
     } catch (error) {
 
         console.error("Save error:", error);
 
-        return "Could not connect to the server. Please try again.";
+        return {
+            success: false,
+            message: "Could not connect to the server. Please try again.",
+            testId: null
+        };
 
     }
 
 }
 
 // ======================================
-// 12. FINISH TYPING TEST
+// 14. COMPLETE DAILY CHALLENGE
+// ======================================
+
+async function completeDailyChallenge(testId) {
+
+    const token = sessionStorage.getItem(
+        "typemaster_token"
+    );
+
+    if (!token || !testId) {
+
+        return {
+            success: false,
+            message: "Your test was saved, but challenge completion could not be submitted."
+        };
+
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/challenges/complete`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    typing_test_id: testId
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+
+            sessionStorage.removeItem(
+                "typemaster_token"
+            );
+
+            return {
+                success: false,
+                message: "Your login session expired. Please log in again."
+            };
+
+        }
+
+        if (!response.ok || !data.success) {
+
+            return {
+                success: false,
+                message: data.message ||
+                    "Challenge completion could not be verified."
+            };
+
+        }
+
+        return {
+            success: true,
+            message:
+                `Daily challenge completed! You earned ${data.pointsAwarded} points!`
+        };
+
+    } catch (error) {
+
+        console.error("Challenge completion error:", error);
+
+        return {
+            success: false,
+            message: "Your typing result was saved, but the challenge could not be submitted. Please check your connection."
+        };
+
+    }
+
+}
+
+// ======================================
+// 15. FINISH TYPING TEST
 // ======================================
 
 async function finishTest() {
@@ -341,14 +506,63 @@ async function finishTest() {
 
     elements.message.textContent = "Saving your result...";
 
-    const message = await saveResult(stats);
+    // First save the typing test.
+    const saveResponse = await saveResult(stats);
 
-    elements.message.textContent = message;
+    if (!saveResponse.success) {
+
+        elements.message.textContent =
+            saveResponse.message;
+
+        return;
+
+    }
+
+    // Normal typing test.
+    if (!isChallengeMode) {
+
+        elements.message.textContent =
+            saveResponse.message;
+
+        return;
+
+    }
+
+    // Challenge mode requires a saved test ID.
+    if (!saveResponse.testId) {
+
+        elements.message.textContent =
+            "Your result was saved, but no test ID was returned. Challenge completion could not be verified.";
+
+        return;
+
+    }
+
+    elements.message.textContent =
+        "Checking your daily challenge...";
+
+    // Submit the saved test ID to the backend.
+    const challengeResponse =
+        await completeDailyChallenge(
+            saveResponse.testId
+        );
+
+    if (challengeResponse.success) {
+
+        elements.message.textContent =
+            challengeResponse.message;
+
+    } else {
+
+        elements.message.textContent =
+            `Typing result saved. ${challengeResponse.message}`;
+
+    }
 
 }
 
 // ======================================
-// 13. START TYPING TEST
+// 16. START TYPING TEST
 // ======================================
 
 function startTest() {
@@ -393,15 +607,21 @@ function startTest() {
 }
 
 // ======================================
-// 14. TEST BUTTON EVENTS
+// 17. TEST BUTTON EVENTS
 // ======================================
 
-elements.start.addEventListener("click", startTest);
+elements.start.addEventListener(
+    "click",
+    startTest
+);
 
-elements.reset.addEventListener("click", resetTest);
+elements.reset.addEventListener(
+    "click",
+    resetTest
+);
 
 // ======================================
-// 15. TYPING INPUT EVENT
+// 18. TYPING INPUT EVENT
 // ======================================
 
 elements.input.addEventListener("input", () => {
@@ -410,14 +630,22 @@ elements.input.addEventListener("input", () => {
 
     updateStats();
 
-    if (elements.input.value.length >= passage.length) {
+    // Normal tests finish when the passage is complete.
+    // Challenges must continue until their timer expires.
+
+    if (
+        !isChallengeMode &&
+        elements.input.value.length >= passage.length
+    ) {
+
         finishTest();
+
     }
 
 });
 
 // ======================================
-// 16. TEST SETTINGS EVENTS
+// 19. TEST SETTINGS EVENTS
 // ======================================
 
 [
@@ -427,14 +655,60 @@ elements.input.addEventListener("input", () => {
     elements.language
 ].forEach(element => {
 
-    element.addEventListener("change", resetTest);
+    element.addEventListener(
+        "change",
+        resetTest
+    );
 
 });
 
 // ======================================
-// 17. INITIALIZE TYPEMASTER
+// 20. CHALLENGE MODE INITIALIZATION
+// ======================================
+
+if (isChallengeMode) {
+
+    // Set the required challenge duration.
+    // Add the option if the HTML does not contain it.
+
+    const durationOptionExists = Array.from(
+        elements.duration.options
+    ).some(option =>
+        Number(option.value) === challengeDuration
+    );
+
+    if (!durationOptionExists) {
+
+        const option = document.createElement("option");
+
+        option.value = String(challengeDuration);
+
+        option.textContent =
+            `${challengeDuration} Seconds`;
+
+        elements.duration.appendChild(option);
+
+    }
+
+    elements.duration.value =
+        String(challengeDuration);
+
+    // Challenge duration and mode cannot be changed.
+    elements.duration.disabled = true;
+    elements.mode.disabled = true;
+
+    console.log(
+        `TypeMaster challenge mode enabled: ${challengeDuration} seconds`
+    );
+
+}
+
+// ======================================
+// 21. INITIALIZE TYPEMASTER
 // ======================================
 
 resetTest();
 
-console.log("TypeMaster typing test initialized successfully!");
+console.log(
+    "TypeMaster typing test initialized successfully!"
+);
