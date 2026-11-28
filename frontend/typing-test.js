@@ -3,8 +3,28 @@
 // TYPEMASTER TYPING TEST SYSTEM
 // ======================================
 
-// Use the same domain for frontend and backend
 const API_URL = "";
+
+// ======================================
+// AUTHENTICATION STORAGE
+// ======================================
+
+function getAuthToken() {
+    const token =
+        localStorage.getItem("typemaster_token") ||
+        sessionStorage.getItem("typemaster_token");
+
+    if (token) {
+        localStorage.setItem("typemaster_token", token);
+    }
+
+    return token;
+}
+
+function clearAuthToken() {
+    localStorage.removeItem("typemaster_token");
+    sessionStorage.removeItem("typemaster_token");
+}
 
 // ======================================
 // 1. CHALLENGE MODE CONFIGURATION
@@ -124,9 +144,7 @@ function makeWordPassage(count) {
 // ======================================
 
 function makeCodePassage() {
-
     return "const message = 'Hello TypeMaster';\nconsole.log(message);";
-
 }
 
 // ======================================
@@ -142,9 +160,6 @@ function makeChallengePassage() {
         passages[language]?.[difficulty] ||
         passages.English.hard;
 
-    // Generate a long passage so the challenge
-    // does not finish before its timer expires.
-
     return Array(40)
         .fill(basePassage)
         .join(" ");
@@ -157,7 +172,6 @@ function makeChallengePassage() {
 
 function getPassage() {
 
-    // Challenge mode always uses a long passage.
     if (isChallengeMode) {
         return makeChallengePassage();
     }
@@ -307,9 +321,7 @@ function resetTest() {
 
 async function saveResult(stats) {
 
-    const token = sessionStorage.getItem(
-        "typemaster_token"
-    );
+    const token = getAuthToken();
 
     if (!token) {
 
@@ -346,9 +358,7 @@ async function saveResult(stats) {
 
         if (response.status === 401) {
 
-            sessionStorage.removeItem(
-                "typemaster_token"
-            );
+            clearAuthToken();
 
             return {
                 success: false,
@@ -395,9 +405,7 @@ async function saveResult(stats) {
 
 async function completeDailyChallenge(testId) {
 
-    const token = sessionStorage.getItem(
-        "typemaster_token"
-    );
+    const token = getAuthToken();
 
     if (!token || !testId) {
 
@@ -430,9 +438,7 @@ async function completeDailyChallenge(testId) {
 
         if (response.status === 401) {
 
-            sessionStorage.removeItem(
-                "typemaster_token"
-            );
+            clearAuthToken();
 
             return {
                 success: false,
@@ -506,7 +512,6 @@ async function finishTest() {
 
     elements.message.textContent = "Saving your result...";
 
-    // First save the typing test.
     const saveResponse = await saveResult(stats);
 
     if (!saveResponse.success) {
@@ -518,7 +523,6 @@ async function finishTest() {
 
     }
 
-    // Normal typing test.
     if (!isChallengeMode) {
 
         elements.message.textContent =
@@ -528,7 +532,6 @@ async function finishTest() {
 
     }
 
-    // Challenge mode requires a saved test ID.
     if (!saveResponse.testId) {
 
         elements.message.textContent =
@@ -541,7 +544,6 @@ async function finishTest() {
     elements.message.textContent =
         "Checking your daily challenge...";
 
-    // Submit the saved test ID to the backend.
     const challengeResponse =
         await completeDailyChallenge(
             saveResponse.testId
@@ -630,9 +632,6 @@ elements.input.addEventListener("input", () => {
 
     updateStats();
 
-    // Normal tests finish when the passage is complete.
-    // Challenges must continue until their timer expires.
-
     if (
         !isChallengeMode &&
         elements.input.value.length >= passage.length
@@ -668,9 +667,6 @@ elements.input.addEventListener("input", () => {
 
 if (isChallengeMode) {
 
-    // Set the required challenge duration.
-    // Add the option if the HTML does not contain it.
-
     const durationOptionExists = Array.from(
         elements.duration.options
     ).some(option =>
@@ -693,7 +689,6 @@ if (isChallengeMode) {
     elements.duration.value =
         String(challengeDuration);
 
-    // Challenge duration and mode cannot be changed.
     elements.duration.disabled = true;
     elements.mode.disabled = true;
 
