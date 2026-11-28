@@ -25,6 +25,36 @@ const registerSubmit = document.getElementById("registerSubmit");
 const logoutButton = document.getElementById("logoutButton");
 
 // ======================================
+// AUTHENTICATION STORAGE
+// ======================================
+
+function getAuthToken() {
+    const token =
+        localStorage.getItem("typemaster_token") ||
+        sessionStorage.getItem("typemaster_token");
+
+    if (token) {
+        localStorage.setItem("typemaster_token", token);
+        sessionStorage.setItem("typemaster_token", token);
+    }
+
+    return token;
+}
+
+function saveAuthToken(token) {
+    localStorage.setItem("typemaster_token", token);
+
+    // Temporary compatibility with other pages
+    // while their storage is being updated.
+    sessionStorage.setItem("typemaster_token", token);
+}
+
+function clearAuthToken() {
+    localStorage.removeItem("typemaster_token");
+    sessionStorage.removeItem("typemaster_token");
+}
+
+// ======================================
 // SWITCH BETWEEN LOGIN AND REGISTER
 // ======================================
 
@@ -210,9 +240,8 @@ loginForm.addEventListener("submit", async (event) => {
             );
         }
 
-        sessionStorage.setItem("typemaster_token", data.token);
+        saveAuthToken(data.token);
 
-        // Verify the login and user profile before redirecting.
         await loadUserProfile(true);
 
     } catch (error) {
@@ -233,7 +262,7 @@ loginForm.addEventListener("submit", async (event) => {
 // ======================================
 
 async function loadUserProfile(redirectToDashboard = false) {
-    const token = sessionStorage.getItem("typemaster_token");
+    const token = getAuthToken();
 
     if (!token) return;
 
@@ -248,10 +277,10 @@ async function loadUserProfile(redirectToDashboard = false) {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            sessionStorage.removeItem("typemaster_token");
-
             if (response.status === 401) {
+                clearAuthToken();
                 showLoginForm();
+
                 showMessage(
                     loginMessage,
                     "Your session has expired. Please log in again.",
@@ -310,7 +339,7 @@ function displayUserProfile(user) {
 // ======================================
 
 logoutButton.addEventListener("click", () => {
-    sessionStorage.removeItem("typemaster_token");
+    clearAuthToken();
 
     profileSection.classList.add("hidden");
 
