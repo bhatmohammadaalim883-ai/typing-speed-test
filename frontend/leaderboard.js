@@ -1,6 +1,31 @@
 
 const API_URL = "";
 
+// ======================================
+// AUTHENTICATION STORAGE
+// ======================================
+
+function getAuthToken() {
+  const token =
+    localStorage.getItem("typemaster_token") ||
+    sessionStorage.getItem("typemaster_token");
+
+  if (token) {
+    localStorage.setItem("typemaster_token", token);
+  }
+
+  return token;
+}
+
+function clearAuthToken() {
+  localStorage.removeItem("typemaster_token");
+  sessionStorage.removeItem("typemaster_token");
+}
+
+// ======================================
+// HTML ELEMENTS
+// ======================================
+
 const periodSelect = document.getElementById("period");
 const refreshBtn = document.getElementById("refreshBtn");
 const leaderboardMessage = document.getElementById("leaderboardMessage");
@@ -10,36 +35,63 @@ const myRankText = document.getElementById("myRankText");
 
 let currentUsername = null;
 
+// ======================================
+// LOAD USER PROFILE
+// ======================================
+
 async function loadMyProfile() {
-  const token = sessionStorage.getItem("typemaster_token");
+
+  const token = getAuthToken();
 
   if (!token) {
+    currentUsername = null;
     myRankText.textContent = "Log in to see your ranking.";
     return;
   }
 
   try {
+
     const response = await fetch(`${API_URL}/api/auth/me`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
 
-    if (!response.ok) {
+    if (response.status === 401) {
+      clearAuthToken();
+      currentUsername = null;
+
       myRankText.textContent =
-        "Your login session may have expired. Please log in again.";
+        "Your login session has expired. Please log in again.";
+
       return;
     }
 
     const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Could not load your profile.");
+    }
+
     currentUsername = data.user?.username || null;
 
   } catch (error) {
+
     console.error("Profile error:", error);
+
+    myRankText.textContent =
+      "Unable to load your profile. Please try again.";
+
   }
+
 }
 
+// ======================================
+// LOAD LEADERBOARD
+// ======================================
+
 async function loadLeaderboard() {
+
   leaderboardMessage.textContent = "Loading leaderboard...";
   leaderboardTable.hidden = true;
   leaderboardBody.replaceChildren();
@@ -47,6 +99,7 @@ async function loadLeaderboard() {
   const period = periodSelect.value;
 
   try {
+
     const response = await fetch(
       `${API_URL}/api/leaderboard?period=${encodeURIComponent(period)}`
     );
@@ -60,17 +113,21 @@ async function loadLeaderboard() {
     const users = data.leaderboard;
 
     if (!Array.isArray(users) || users.length === 0) {
+
       leaderboardMessage.textContent =
         "No typing test results are available for this period yet.";
 
       myRankText.textContent = "No ranking available yet.";
+
       return;
+
     }
 
     leaderboardMessage.textContent = "";
     leaderboardTable.hidden = false;
 
     users.forEach((user, index) => {
+
       const row = document.createElement("tr");
 
       const rank = document.createElement("td");
@@ -92,20 +149,30 @@ async function loadLeaderboard() {
         Number(user.average_accuracy).toFixed(1) + "%";
 
       row.append(rank, username, tests, wpm, accuracy);
+
       leaderboardBody.appendChild(row);
+
     });
 
     updateMyRanking(users);
 
   } catch (error) {
+
     console.error("Leaderboard error:", error);
 
     leaderboardMessage.textContent =
       "Unable to load rankings. Please try again later.";
+
   }
+
 }
 
+// ======================================
+// UPDATE PERSONAL RANKING
+// ======================================
+
 function updateMyRanking(users) {
+
   if (!currentUsername) {
     myRankText.textContent = "Log in to see your ranking.";
     return;
@@ -116,9 +183,12 @@ function updateMyRanking(users) {
   );
 
   if (index === -1) {
+
     myRankText.textContent =
       "You have no ranking in this period yet. Complete a typing test to qualify.";
+
     return;
+
   }
 
   const user = users[index];
@@ -126,14 +196,29 @@ function updateMyRanking(users) {
   myRankText.textContent =
     `Your rank: #${index + 1} | Average speed: ` +
     `${Number(user.average_wpm).toFixed(1)} WPM`;
+
 }
+
+// ======================================
+// INITIALIZE LEADERBOARD
+// ======================================
 
 async function initializeLeaderboard() {
+
   await loadMyProfile();
+
   await loadLeaderboard();
+
 }
 
+// ======================================
+// EVENT LISTENERS
+// ======================================
+
 periodSelect.addEventListener("change", loadLeaderboard);
+
 refreshBtn.addEventListener("click", initializeLeaderboard);
 
 initializeLeaderboard();
+
+console.log("TypeMaster leaderboard initialized successfully!");
