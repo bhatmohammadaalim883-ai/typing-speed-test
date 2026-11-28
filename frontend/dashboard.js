@@ -3,8 +3,28 @@
 // TYPEMASTER DASHBOARD
 // ======================================
 
-// Use the same domain for frontend and backend
 const API_URL = "";
+
+// ======================================
+// AUTHENTICATION STORAGE
+// ======================================
+
+function getAuthToken() {
+    const token =
+        localStorage.getItem("typemaster_token") ||
+        sessionStorage.getItem("typemaster_token");
+
+    if (token) {
+        localStorage.setItem("typemaster_token", token);
+    }
+
+    return token;
+}
+
+function clearAuthToken() {
+    localStorage.removeItem("typemaster_token");
+    sessionStorage.removeItem("typemaster_token");
+}
 
 // ======================================
 // INITIALIZE DASHBOARD
@@ -28,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadDashboard() {
 
-    const token = sessionStorage.getItem("typemaster_token");
+    const token = getAuthToken();
 
     if (!token) {
         window.location.href = "account.html";
@@ -37,13 +57,10 @@ async function loadDashboard() {
 
     try {
 
-        // Get logged-in user
         const userResponse = await fetch(`${API_URL}/api/auth/me`, {
-
             headers: {
                 Authorization: `Bearer ${token}`
             }
-
         });
 
         if (userResponse.status === 401) {
@@ -59,7 +76,6 @@ async function loadDashboard() {
 
         displayUser(userData.user);
 
-        // Get typing statistics
         await loadTypingStatistics(token);
 
     } catch (error) {
@@ -142,9 +158,7 @@ async function loadTypingStatistics(token) {
 function displayStatistics(stats) {
 
     const totalTests = Number(stats.total_tests) || 0;
-
     const averageWpm = Number(stats.average_wpm) || 0;
-
     const averageAccuracy = Number(stats.average_accuracy) || 0;
 
     document.getElementById("totalTests").textContent = totalTests;
@@ -171,28 +185,22 @@ function displayRecentActivity(tests) {
     activityContainer.replaceChildren();
 
     if (!Array.isArray(tests) || tests.length === 0) {
-
         showActivityMessage("No typing tests completed yet.");
-
         return;
     }
 
     tests.forEach((test) => {
 
         const item = document.createElement("div");
-
         item.className = "activity-item";
 
         const details = document.createElement("div");
-
         details.className = "activity-details";
 
         const title = document.createElement("h3");
-
         title.textContent = `${test.language} Typing Test`;
 
         const date = document.createElement("p");
-
         const parsedDate = new Date(test.created_at);
 
         date.textContent = Number.isNaN(parsedDate.getTime())
@@ -200,22 +208,17 @@ function displayRecentActivity(tests) {
             : parsedDate.toLocaleString("en-IN");
 
         const score = document.createElement("div");
-
         score.className = "activity-score";
 
         const wpm = document.createElement("span");
-
         wpm.textContent = `${Number(test.wpm).toFixed(1)} WPM`;
 
         const accuracy = document.createElement("span");
-
         accuracy.textContent =
             `${Number(test.accuracy).toFixed(1)}% Accuracy`;
 
         details.append(title, date);
-
         score.append(wpm, accuracy);
-
         item.append(details, score);
 
         activityContainer.appendChild(item);
@@ -235,7 +238,6 @@ function showActivityMessage(message) {
     if (!container) return;
 
     const paragraph = document.createElement("p");
-
     paragraph.textContent = message;
 
     container.replaceChildren(paragraph);
@@ -248,7 +250,7 @@ function showActivityMessage(message) {
 
 function logout() {
 
-    sessionStorage.removeItem("typemaster_token");
+    clearAuthToken();
 
     window.location.href = "account.html";
 
