@@ -4,6 +4,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Same-origin backend connection
     const API_URL = "";
 
+    // ======================================
+    // AUTHENTICATION STORAGE
+    // ======================================
+
+    function getAuthToken() {
+        const token =
+            localStorage.getItem("typemaster_token") ||
+            sessionStorage.getItem("typemaster_token");
+
+        if (token) {
+            localStorage.setItem("typemaster_token", token);
+        }
+
+        return token;
+    }
+
+    function clearAuthToken() {
+        localStorage.removeItem("typemaster_token");
+        sessionStorage.removeItem("typemaster_token");
+    }
+
+    // ======================================
+    // HTML ELEMENTS
+    // ======================================
+
     const startButton = document.getElementById("startChallengeBtn");
     const challengeTitle = document.getElementById("challengeTitle");
     const challengeDescription = document.getElementById("challengeDescription");
@@ -18,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const currentStreak = document.getElementById("currentStreak");
     const historyList = document.getElementById("historyList");
 
-    const token = sessionStorage.getItem("typemaster_token");
+    const token = getAuthToken();
 
     let todayChallenge = null;
     let challengeDate = null;
@@ -40,6 +65,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
+        if (response.status === 401) {
+            clearAuthToken();
+            showLoginMessage("Your login session has expired. Please log in again.");
+            return;
+        }
+
         const data = await response.json();
 
         if (!response.ok || !data.success) {
@@ -48,7 +79,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         todayChallenge = data.challenge;
 
-        // Check that today's challenge exists before accessing its properties.
         if (!todayChallenge) {
             throw new Error("Today's challenge was not returned by the server.");
         }
@@ -211,7 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // LOGIN REQUIRED MESSAGE
     // ======================================
 
-    function showLoginMessage() {
+    function showLoginMessage(messageText) {
 
         challengeTitle.textContent = "Login Required";
 
@@ -219,6 +249,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Please log in to access daily challenges and save your progress.";
 
         challengeStatus.textContent =
+            messageText ||
             "Your challenge progress is connected to your account.";
 
         startButton.disabled = true;
